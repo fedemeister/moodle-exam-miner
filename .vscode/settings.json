@@ -1,0 +1,8 @@
+{
+    "conventionalCommits.scopes": [
+        "tool_data_input_examples",
+        "scripts",
+        "tool_input",
+        "tool_output"
+    ]
+}
