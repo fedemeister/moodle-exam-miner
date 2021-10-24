@@ -72,19 +72,18 @@ def merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respu
 
 merge_df = merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respuestas_df)
 
-def misma_pregunta_luego(x, pregunta, respuesta, fin):
-    if len(merge_df['Código'][(merge_df['Q'+str(x)+'_q'] == pregunta) & (merge_df['Fin'] >= fin)])>1:
-        cod1 = merge_df['Código'][(merge_df['Q'+str(x)+'_q'] == pregunta) & (merge_df['Fin'] >= fin)].iloc[1] # el siguiente
-        if len(merge_df['Código'][(merge_df['Q'+str(x)+'_q'] == pregunta) & (merge_df['Fin'] >= fin) & 
-                               (merge_df['Q'+str(x)+'_a'] == respuesta)])>1:
-            cod2 = merge_df['Código'][(merge_df['Q'+str(x)+'_q'] == pregunta) & (merge_df['Fin'] >= fin) & 
-                               (merge_df['Q'+str(x)+'_a'] == respuesta)].iloc[1] # el siguiente
+def misma_pregunta_luego(x, pregunta, respuesta, hora_respuesta):
+    if len(merge_df['Código'][(merge_df['Q'+str(x)+'_q'] == pregunta) & (merge_df['Q'+str(x)+'_t'] > hora_respuesta)])>0:
+        cod1 = merge_df['Código'][(merge_df['Q'+str(x)+'_q'] == pregunta) & (merge_df['Q'+str(x)+'_t'] > hora_respuesta)].iloc[0] # el siguiente
+        if len(merge_df['Código'][(merge_df['Q'+str(x)+'_q'] == pregunta) & (merge_df['Q'+str(x)+'_t'] > hora_respuesta) & 
+                               (merge_df['Q'+str(x)+'_a'] == respuesta)])>0:
+            cod2 = merge_df['Código'][(merge_df['Q'+str(x)+'_q'] == pregunta) & (merge_df['Q'+str(x)+'_t'] > hora_respuesta) & 
+                               (merge_df['Q'+str(x)+'_a'] == respuesta)].iloc[0] # el siguiente
             return cod1==cod2, cod1
         else:
             return False, '0'
     else:
         return False, '0'
-
 
 def CA(i):
     student = {}
@@ -94,18 +93,18 @@ def CA(i):
     segundos = merge_df['Segundos'][i]
     nota = merge_df['Nota'][i]
 
-    lista_CA_r = []
-    lista_CA_i = []
-    lista_CA_p = []
-    lista_CA_c = []
+    lista_CA_r = [] #respuestas
+    lista_CA_i = [] # 1 si es pregunta 1, 2 si es pregunta 2 y así sucesivamente
+    lista_CA_p = [] # pregunta
+    lista_CA_c = [] # código del alumno o userXYZ
     for x in range (1,11):
         pregunta = merge_df['Q'+str(x)+'_q'][i]
         puntuacion = merge_df['Q'+str(x)+'_m'][i]
         respuesta = merge_df['Q'+str(x)+'_a'][i]
-        
+        hora = merge_df['Q'+str(x)+'_t'][i]
+
         if puntuacion == 1.0:
-            #cod, flag_otro = misma_pregunta_luego(x,pregunta,respuesta,fin)
-            flag, cod = misma_pregunta_luego(x, pregunta, respuesta, fin)
+            flag, cod = misma_pregunta_luego(x, pregunta, respuesta, hora)
             if flag == True:
                 lista_CA_r.append(respuesta)
                 lista_CA_i.append(x)
