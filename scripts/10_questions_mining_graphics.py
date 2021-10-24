@@ -46,8 +46,8 @@ for x in range(0,len(log_json['questions'])):
 
 
         titulo = str(json_df.pregunta[0])
-
-        plot = sns.lineplot(data=json_df[['porcentaje_acertadas', 'porcentaje_errores']], markers=True, linewidth=2.0)
+        json_df = json_df.rename(columns={"porcentaje_acertadas": "porcentaje_aciertos_acumulado", "porcentaje_errores": "porcentaje_errores_acumulado"})
+        plot = sns.lineplot(data=json_df[['porcentaje_aciertos_acumulado', 'porcentaje_errores_acumulado']], markers=True, linewidth=2.0)
         plot.set_title("Comportamiento de :  " + titulo)
 
         plot.set_xlabel('Fecha del suceso')
