@@ -5,3 +5,4 @@ fake_names.xlsx
 fake_names - Copy.xlsx
 names.py
 *.ipynb
+.idea/*
