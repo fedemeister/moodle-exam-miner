@@ -2,43 +2,7 @@ import numpy as np  # linear algebra
 import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
 import json
 from datetime import datetime
-
-calificaciones_df = pd.read_excel('files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx')
-respuestas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/answers_cleaned.xlsx')
-preguntas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/all_questions.xlsx')
-hora_respuestas_df = pd.read_excel('files/tool_output/04_answers_time/answer_times_merged.xlsx')
-
-py_collaboartor_df = respuestas_df[['Nombre', 'Código', 'Inicio', 'Fin', 'Segundos', 'Nota']]
-py_collaboartor_df["Productividad"] = (py_collaboartor_df["Nota"] / (py_collaboartor_df["Segundos"] / 60))
-
-
-def respuesta_correcta(pregunta):
-    return preguntas_df['Answer'][(preguntas_df['Question'] == pregunta)
-                                  & (preguntas_df['Qualification'] == 1.0)].values[0]
-
-
-def alumnos_terminarion_antes(hora):
-    return merge_df["Fin"] <= hora
-
-
-def personas_menor_productividad(productividad):
-    return merge_df["Productividad"] <= productividad
-
-
-def respuestas_del_alumno(codigo):
-    alumno = merge_df[merge_df["Código"] == codigo]
-    return alumno[["Nombre", "Código", "Q1_a", "Q2_a", "Q3_a", "Q4_a", "Q5_a", "Q6_a", "Q7_a", "Q8_a", "Q9_a", "Q10_a"]]
-
-
-def calificaciones_del_alumno(codigo):
-    calificaciones = merge_df[merge_df["Código"] == codigo]
-    return calificaciones[
-        ["Nombre", "Código", "Q1_m", "Q2_m", "Q3_m", "Q4_m", "Q5_m", "Q6_m", "Q7_m", "Q8_m", "Q9_m", "Q10_m"]]
-
-
-def pregunta_correspondiente(respuesta):
-    return preguntas_df['Question'][preguntas_df['Answer'] == respuesta].values[0]
-
+from scripts.script6.py_collaborator_outputs import NumpyEncoder
 
 def merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respuestas_df):
     merge_df = pd.DataFrame(data=py_collaboartor_df[['Nombre', 'Código',
@@ -78,10 +42,7 @@ def merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respu
     return merge_df
 
 
-merge_df = merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respuestas_df)
-
-
-def misma_pregunta_luego(x, pregunta, respuesta, hora_respuesta):
+def misma_pregunta_luego(x, pregunta, respuesta, hora_respuesta, merge_df):
     if len(merge_df['Código'][
                (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)]) > 0:
         cod1 = merge_df['Código'][
@@ -100,7 +61,7 @@ def misma_pregunta_luego(x, pregunta, respuesta, hora_respuesta):
         return False, '0'
 
 
-def CA(i):
+def CA(i, merge_df):
     student = {}
     codigo = merge_df['Código'][i]
     inicio = merge_df['Inicio'][i]
@@ -119,7 +80,7 @@ def CA(i):
         hora = merge_df['Q' + str(x) + '_t'][i]
 
         if puntuacion == 1.0:
-            flag, cod = misma_pregunta_luego(x, pregunta, respuesta, hora)
+            flag, cod = misma_pregunta_luego(x, pregunta, respuesta, hora, merge_df)
             if flag == True:
                 lista_CA_r.append(respuesta)
                 lista_CA_i.append(x)
@@ -140,7 +101,7 @@ def CA(i):
     return student
 
 
-def ratio_preg(i, verbose=True):
+def ratio_preg(i, preguntas_df, merge_df, verbose=True):
     questions = {}
     preg = preguntas_df['Question'].iloc[i]
     lista_c = []
@@ -180,47 +141,41 @@ def ratio_preg(i, verbose=True):
     return questions
 
 
-salida_preg = []
-for i in range(0, len(preguntas_df), 4):
-    salida_preg.append(ratio_preg(i, verbose=False))
+def run_script07():
+    calificaciones_df = pd.read_excel('files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx')
+    respuestas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/answers_cleaned.xlsx')
+    preguntas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/all_questions.xlsx')
+    hora_respuestas_df = pd.read_excel('files/tool_output/04_answers_time/answer_times_merged.xlsx')
+    py_collaboartor_df = pd.read_excel('files/tool_output/06_py_collaborator_outputs/py_cheat_df.xlsx')
+    #py_collaboartor_df = respuestas_df[['Nombre', 'Código', 'Inicio', 'Fin', 'Segundos', 'Nota']]
+    #py_collaboartor_df["Productividad"] = (py_collaboartor_df["Nota"] / (py_collaboartor_df["Segundos"] / 60))
 
-diccionario = {}
-diccionario["questions"] = salida_preg
-
-
-class NumpyEncoder(json.JSONEncoder):
-    """ Special json encoder for numpy types """
-
-    def default(self, obj):
-        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
-                            np.int16, np.int32, np.int64, np.uint8,
-                            np.uint16, np.uint32, np.uint64)):
-            return int(obj)
-        elif isinstance(obj, (np.float_, np.float16, np.float32,
-                              np.float64)):
-            return float(obj)
-        elif isinstance(obj, (np.ndarray,)):
-            return obj.tolist()
-        elif isinstance(obj, datetime):
-            return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
+    merge_df = merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respuestas_df)
 
 
-with open('files/tool_output/07_acumulated_knowladge/outputRatioPreg.json', 'w', encoding='utf8') as outfile:
-    json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
+    salida_preg = []
+    for i in range(0, len(preguntas_df), 4):
+        salida_preg.append(ratio_preg(i, preguntas_df, merge_df, verbose=False))
 
-salida = []
-for i in range(len(merge_df)):
-    salida.append(CA(i))
+    diccionario = {}
+    diccionario["questions"] = salida_preg
 
-diccionario = {}
-diccionario["students"] = salida
 
-with open('files/tool_output/07_acumulated_knowladge/outputCA.json', 'w', encoding='utf8') as outfile:
-    json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
+    with open('files/tool_output/07_acumulated_knowladge/outputRatioPreg.json', 'w', encoding='utf8') as outfile:
+        json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
 
-result = merge_df.to_json(index='Nombre', orient="index", date_format='iso', date_unit='s')
-parsed = json.loads(result)
+    salida = []
+    for i in range(len(merge_df)):
+        salida.append(CA(i, merge_df))
 
-with open('files/tool_output/07_acumulated_knowladge/merge_df.json', 'w', encoding='utf8') as outfile:
-    json.dump(parsed, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
+    diccionario = {}
+    diccionario["students"] = salida
+
+    with open('files/tool_output/07_acumulated_knowladge/outputCA.json', 'w', encoding='utf8') as outfile:
+        json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
+
+    result = merge_df.to_json(index='Nombre', orient="index", date_format='iso', date_unit='s')
+    parsed = json.loads(result)
+
+    with open('files/tool_output/07_acumulated_knowladge/merge_df.json', 'w', encoding='utf8') as outfile:
+        json.dump(parsed, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)

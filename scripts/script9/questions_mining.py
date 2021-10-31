@@ -2,30 +2,11 @@ import pandas as pd
 import json
 import numpy as np
 from datetime import datetime
-
-preguntas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/all_questions.xlsx')
-merge_df = pd.read_excel('files/tool_output/07_acumulated_knowladge/merge_df.xlsx')
+from scripts.script6.py_collaborator_outputs import NumpyEncoder
 
 
-class NumpyEncoder(json.JSONEncoder):
-    """ Special json encoder for numpy types """
 
-    def default(self, obj):
-        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
-                            np.int16, np.int32, np.int64, np.uint8,
-                            np.uint16, np.uint32, np.uint64)):
-            return int(obj)
-        elif isinstance(obj, (np.float_, np.float16, np.float32,
-                              np.float64)):
-            return float(obj)
-        elif isinstance(obj, (np.ndarray,)):
-            return obj.tolist()
-        elif isinstance(obj, datetime):
-            return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
-
-
-def funcion(i):
+def funcion(i, merge_df, preguntas_df):
     questions = {}
     preg = preguntas_df['Question'].iloc[i]
     lista = []
@@ -53,13 +34,16 @@ def funcion(i):
 
     return questions
 
+def run_script09():
+        preguntas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/all_questions.xlsx')
+        merge_df = pd.read_excel('files/tool_output/07_acumulated_knowladge/merge_df.xlsx')
 
-salida_preg = []
-for i in range(0, len(preguntas_df), 4):
-    salida_preg.append(funcion(i))
+        salida_preg = []
+        for i in range(0, len(preguntas_df), 4):
+            salida_preg.append(funcion(i, merge_df, preguntas_df))
 
-diccionario = {}
-diccionario["questions"] = salida_preg
+        diccionario = {}
+        diccionario["questions"] = salida_preg
 
-with open('files/tool_output/09_questions_mining/comportamientoPregunta.json', 'w', encoding='utf8') as outfile:
-    json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
+        with open('files/tool_output/09_questions_mining/comportamientoPregunta.json', 'w', encoding='utf8') as outfile:
+            json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)

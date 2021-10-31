@@ -4,36 +4,46 @@ import json
 from datetime import datetime
 import json
 
-respuestas_df = pd.read_excel("files/tool_output/05_answers_and_questions_cleaned/answers_cleaned.xlsx")
-calificaciones_df = pd.read_excel("files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx")
+class NumpyEncoder(json.JSONEncoder):
+    """ Special json encoder for numpy types """
 
-# hacer dataframe con "Inicio-Fin-Segundos-Nota"
-py_cheat_df = calificaciones_df[["Código", "Inicio", "Fin", "Segundos", "Nota"]]
+    def default(self, obj):
+        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
+                            np.int16, np.int32, np.int64, np.uint8,
+                            np.uint16, np.uint32, np.uint64)):
+            return int(obj)
+        elif isinstance(obj, (np.float_, np.float16, np.float32,
+                              np.float64)):
+            return float(obj)
+        elif isinstance(obj, (np.ndarray,)):
+            return obj.tolist()
+        elif isinstance(obj, datetime):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
 
 
-
-def alumnos_terminarion_antes(hora):
+def alumnos_terminarion_antes(hora, py_cheat_df):
     return py_cheat_df["Fin"] <= hora
 
 
-def personas_menor_productividad(productividad):
+def personas_menor_productividad(productividad, py_cheat_df):
     return py_cheat_df["Productividad"] <= productividad
 
 
-def respuestas_del_alumno(codigo):
+def respuestas_del_alumno(codigo, respuestas_df):
     alumno = respuestas_df[respuestas_df["Código"] == codigo]
     return alumno[["Código", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10"]]
 
 
-def calificacinoes_del_alumno(codigo):
+def calificacinoes_del_alumno(codigo, calificaciones_df):
     calificaciones = calificaciones_df[calificaciones_df["Código"] == codigo]
     return calificaciones[["Código", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10"]]
 
 
-def function(i, columnas, edge_list=False):
-    pers_productividad = personas_menor_productividad(py_cheat_df["Productividad"][i])
+def function(i, columnas, py_cheat_df, respuestas_df, calificaciones_df, edge_list=False):
+    pers_productividad = personas_menor_productividad(py_cheat_df["Productividad"][i], py_cheat_df)
     inic = py_cheat_df["Inicio"][i]
-    pers_antes = alumnos_terminarion_antes(inic)
+    pers_antes = alumnos_terminarion_antes(inic, py_cheat_df)
 
     dataf = py_cheat_df[pers_productividad & pers_antes]
 
@@ -41,11 +51,11 @@ def function(i, columnas, edge_list=False):
 
     cod_alumno = py_cheat_df["Código"][i]
 
-    respuestas_alumno_i_df = respuestas_del_alumno(cod_alumno)
-    calificaciones_alumno_i_df = calificacinoes_del_alumno(cod_alumno)
+    respuestas_alumno_i_df = respuestas_del_alumno(cod_alumno, respuestas_df)
+    calificaciones_alumno_i_df = calificacinoes_del_alumno(cod_alumno, calificaciones_df)
 
     for i in range(len(dataf)):
-        df2 = respuestas_del_alumno(dataf['Código'].iloc[i])
+        df2 = respuestas_del_alumno(dataf['Código'].iloc[i], respuestas_df)
         respuestas_otros_df = respuestas_otros_df.append(df2, ignore_index=True)
 
     respuestas_contadas = []
@@ -95,30 +105,20 @@ def function(i, columnas, edge_list=False):
     return student
 
 
-class NumpyEncoder(json.JSONEncoder):
-    """ Special json encoder for numpy types """
-
-    def default(self, obj):
-        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
-                            np.int16, np.int32, np.int64, np.uint8,
-                            np.uint16, np.uint32, np.uint64)):
-            return int(obj)
-        elif isinstance(obj, (np.float_, np.float16, np.float32,
-                              np.float64)):
-            return float(obj)
-        elif isinstance(obj, (np.ndarray,)):
-            return obj.tolist()
-        elif isinstance(obj, datetime):
-            return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
-
-
 def run_script06():
+
+    respuestas_df = pd.read_excel("files/tool_output/05_answers_and_questions_cleaned/answers_cleaned.xlsx")
+    calificaciones_df = pd.read_excel("files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx")
+    # hacer dataframe con "Inicio-Fin-Segundos-Nota"
+    py_cheat_df = calificaciones_df[["Nombre", "Código", "Inicio", "Fin", "Segundos", "Nota"]]
+    py_cheat_df["Productividad"] = (py_cheat_df["Nota"] / (py_cheat_df["Segundos"] / 60))
+    py_cheat_df.to_excel('files/tool_output/06_py_collaborator_outputs/py_cheat_df.xlsx', index=False)
+
     columnas = ["Código", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10"]
 
     salida = []
     for i in range(len(py_cheat_df)):
-        salida.append(function(i, columnas))
+        salida.append(function(i, columnas, py_cheat_df, respuestas_df, calificaciones_df))
 
     diccionario = {}
     diccionario["students"] = salida
@@ -127,4 +127,4 @@ def run_script06():
         json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
 
 
-run_script06()
+#run_script06()
