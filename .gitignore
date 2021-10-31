@@ -6,3 +6,5 @@ fake_names - Copy.xlsx
 names.py
 *.ipynb
 .idea/*
+__pycache__/
+*.zip
