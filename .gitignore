@@ -13,7 +13,8 @@ files/tool_output/08_student_exam_logs/individual_logs/*.xlsx
 files/tool_output/09_questions_mining/*.json
 files/tool_output/10_questions_mining_graphics/comportamiento_preguntas/*.png
 
-files/tool_input/*
+files/tool_input/*.json
+files/tool_input/*.xml
 files/tool_data_input_examples/exam_22052020/*
 fake_names.xlsx
 fake_names - Copy.xlsx
