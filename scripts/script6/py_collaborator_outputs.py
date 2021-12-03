@@ -110,7 +110,7 @@ def run_script06():
     respuestas_df = pd.read_excel("files/tool_output/05_answers_and_questions_cleaned/answers_cleaned.xlsx")
     calificaciones_df = pd.read_excel("files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx")
     # hacer dataframe con "Inicio-Fin-Segundos-Nota"
-    py_cheat_df = calificaciones_df[["Nombre", "Código", "Inicio", "Fin", "Segundos", "Nota"]]
+    py_cheat_df = calificaciones_df[["Nombre", "Código", "Tiempo", "Inicio", "Fin", "Segundos", "Nota"]]
     py_cheat_df["Productividad"] = (py_cheat_df["Nota"] / (py_cheat_df["Segundos"] / 60))
     py_cheat_df.to_excel('files/tool_output/06_py_collaborator_outputs/py_cheat_df.xlsx', index=False)
 

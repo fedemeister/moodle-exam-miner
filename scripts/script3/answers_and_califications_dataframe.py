@@ -83,7 +83,7 @@ def formateo_json(my_json: list, devolver: bool = False):
             for i in range(5, 7):
                 fecha = cambiar_formato_fecha(alumno[i])
                 alumno[i] = datetime.strptime(fecha, "%d %m %Y %H:%M")  # %d=22 %m=05 %Y=2020 %H=11:%M=23
-
+            alumno[4] = alumno[7] # guardamos los minutos y los segundos en ese formato para mostrarlos en el front final
             alumno[7] = duracion_a_segundos(alumno[7])
             if "SELECT" in alumno[9] or "FROM" in alumno[9] or "WHERE" in alumno[9] or "LIKE" in alumno[
                 9]:  # estamos en respuestas_json
@@ -116,7 +116,7 @@ def guardar_json_formateado_csv(data: list):
 
 
 def execution():
-    columnas = ['Apellidos', 'Nombre', 'Código', 'Email', 'Estado', 'Inicio', 'Fin', 'Segundos', 'Nota',
+    columnas = ['Apellidos', 'Nombre', 'Código', 'Email', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota',
                 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10']
 
     with open('files/tool_output/01_anonymized_input/exam_answers_utf8_anonymized.json', encoding='utf-8') as json_file:

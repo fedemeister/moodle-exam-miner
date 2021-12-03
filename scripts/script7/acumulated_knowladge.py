@@ -5,9 +5,9 @@ from datetime import datetime
 from scripts.script6.py_collaborator_outputs import NumpyEncoder
 
 def merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respuestas_df):
-    merge_df = pd.DataFrame(data=py_collaboartor_df[['Nombre', 'Código',
+    merge_df = pd.DataFrame(data=py_collaboartor_df[['Nombre', 'Código', 'Tiempo',
                                                      'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']]
-                            , columns=['Nombre', 'Código',
+                            , columns=['Nombre', 'Código', 'Tiempo',
                                        'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad',
                                        'Q1_t', 'Q1_q', 'Q1_a', 'Q1_m',
                                        'Q2_t', 'Q2_q', 'Q2_a', 'Q2_m',
