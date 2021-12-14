@@ -9,6 +9,7 @@ def merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respu
                                                      'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']]
                             , columns=['Nombre', 'Código', 'Tiempo',
                                        'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad',
+                                       'Q0_t', 'Q0_q', 'Q0_a', 'Q0_m',
                                        'Q1_t', 'Q1_q', 'Q1_a', 'Q1_m',
                                        'Q2_t', 'Q2_q', 'Q2_a', 'Q2_m',
                                        'Q3_t', 'Q3_q', 'Q3_a', 'Q3_m',
@@ -21,6 +22,10 @@ def merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respu
                                        'Q10_t', 'Q10_q', 'Q10_a', 'Q10_m'])
 
     for i in range(0, merge_df.shape[0]):
+        merge_df['Q0_t'][i] = respuestas_df['Inicio'][i]
+        merge_df['Q0_a'][i] = '-'
+        merge_df['Q0_q'][i] = '-'
+        merge_df['Q0_m'][i] = 0
         for x in range(1, 11):
             # merge_df['Código'][i] = respuestas_df['Código'][i]
             aux = respuestas_df['Q' + str(x)][i]
