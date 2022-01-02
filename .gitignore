@@ -6,9 +6,7 @@ files/tool_output/04_answers_time/individual_answer_times/*.xlsx
 files/tool_output/04_answers_time/answer_times_merged.xlsx
 files/tool_output/05_answers_and_questions_cleaned/*.xlsx
 files/tool_output/06_py_collaborator_outputs/*.json
-files/tool_output/06_py_collaborator_outputs/*.xlsx
 files/tool_output/07_acumulated_knowladge/*.json
-files/tool_output/07_acumulated_knowladge/*.xlsx
 files/tool_output/08_student_exam_logs/individual_logs/*.xlsx
 files/tool_output/09_questions_mining/*.json
 files/tool_output/10_questions_mining_graphics/comportamiento_preguntas/*.png
