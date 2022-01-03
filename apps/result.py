@@ -14,7 +14,7 @@ nube_puntos = web.graph_scatter_plot.nube_puntos()
 
 fig_estudiantes = web.graph_fig_estudiantes.fig_estudiantes()
 
-functions_for_clusters.creacion_padre_hijo()
+#functions_for_clusters.creacion_padre_hijo()
 df_clusters_total = pd.read_excel('files/tool_output/clustering/df_clusters_total.xlsx')
 all_clusters = df_clusters_total.Cluster.unique()
 
@@ -67,43 +67,7 @@ def fig_clusters(clusters):
     return fig_clusters
 
 
-
-
-def function (x, df_merged):
-    df_merged = df_merged.rename(columns={
-                                'Q1_m': 'Pregunta 1',
-                                'Q2_m': 'Pregunta 2',
-                                'Q3_m': 'Pregunta 3',
-                                'Q4_m': 'Pregunta 4',
-                                'Q5_m': 'Pregunta 5',
-                                'Q6_m': 'Pregunta 6',
-                                'Q7_m': 'Pregunta 7',
-                                'Q8_m': 'Pregunta 8',
-                                'Q9_m': 'Pregunta 9',
-                                'Q10_m': 'Pregunta 10',
-                            })
-
-    melt = pd.melt(df_merged,
-                id_vars=['Nombre', 'Q'+str(x)+'_t', 'Q'+str(x)+'_q', 'Q'+str(x)+'_a'],
-                #value_vars=['Q'+str(x)+'_m'],
-                value_vars=['Pregunta '+str(x)],
-                var_name=['Número'],
-                value_name='Nota obtenida para esa pregunta')
-
-    melt = melt.rename(columns={'Q'+str(x)+'_t': 'Hora',
-                            'Q'+str(x)+'_q': 'Pregunta',
-                            'Q'+str(x)+'_a': 'Respuesta',
-                            })
-
-    melt = melt.sort_values(by=['Hora'])
-    return melt
-
-df_merged = pd.read_excel("files/tool_output/07_acumulated_knowladge/merge_df.xlsx")
-df_line_chart = pd.DataFrame()
-for i in range (1,11):
-    df_line_chart = df_line_chart.append(function (i, df_merged))
-
-df_line_chart = df_line_chart.reset_index(drop=True)
+df_line_chart = pd.read_excel('df_line_chart.xlsx')
 all_questions = df_line_chart['Número'].unique()
 
 @app.callback(
