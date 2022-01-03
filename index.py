@@ -7,12 +7,13 @@ from app import app
 from app import server
 
 # Connect to your app pages
-from apps import result
+from apps import hello, result
 
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div([
+        dcc.Link('Hello', href='/apps/hello'),
         dcc.Link('Results', href='/apps/result'),
     ], className="row"),
     html.Div(id='page-content', children=[])
@@ -23,7 +24,7 @@ app.layout = html.Div([
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/apps/hello':
-        return "Moodle Exam Miner"
+        return hello.layout
     if pathname == '/apps/result':
         return result.layout
     else:
