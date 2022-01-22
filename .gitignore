@@ -21,3 +21,5 @@ names.py
 .idea/*
 __pycache__/
 *.zip
+/venv/
+/.vscode/
