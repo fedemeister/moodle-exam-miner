@@ -1,14 +1,12 @@
 # moodle-exam-miner [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-This project still being develop in a local machine and some of the updates are being posted. 
-Once it is complete we are going to say it.
+This is a beta version of the project.  It is currently in development with regular updates. Once it is completed we will let you know and release the official version!
 
-The technology used is pandas + plotly and with just that we can process Moodle files
+
+The technology used is **pandas** to deal with data and **plotly** to make interactive graphs of the results.
 
 ## Installation
-First of all, we highly recommend you to [install packages using pip and virtual enviroments create a virtual environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
+First of all, we highly recommend you to [install packages using pip and virtual enviroments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
 and upgrade basic packages as follows:
-
-In the actual mooodle-exam-miner version, we are using [Python 3.8.12](https://www.python.org/downloads/release/python-3812/)
 
 ```bash
 python3 -m pip install --upgrade pip setuptools wheel
@@ -21,6 +19,7 @@ source my_env/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+In the actual mooodle-exam-miner version, we are using [Python 3.8.12](https://www.python.org/downloads/release/python-3812/)
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
