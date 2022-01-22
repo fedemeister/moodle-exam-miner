@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from scripts.script6.py_collaborator_outputs import NumpyEncoder
 
+
 def merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respuestas_df):
     merge_df = pd.DataFrame(data=py_collaboartor_df[['Nombre', 'Código', 'Tiempo',
                                                      'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']]
@@ -118,7 +119,7 @@ def ratio_preg(i, preguntas_df, merge_df, verbose=True):
                 (merge_df['Q' + str(x) + '_q'] == preg) & (merge_df['Q' + str(x) + '_m'] == 1.0)].tolist()
             lista_i = merge_df['Q' + str(x) + '_a'][
                 (merge_df['Q' + str(x) + '_q'] == preg) & (merge_df['Q' + str(x) + '_m'] == -0.25)].tolist()
-            if verbose == True:
+            if verbose:
                 len_c = len(lista_c)
                 len_i = len(lista_i)
                 # if len_c and len_i != 0:
@@ -152,19 +153,16 @@ def run_script07():
     preguntas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/all_questions.xlsx')
     hora_respuestas_df = pd.read_excel('files/tool_output/04_answers_time/answer_times_merged.xlsx')
     py_collaboartor_df = pd.read_excel('files/tool_output/06_py_collaborator_outputs/py_cheat_df.xlsx')
-    #py_collaboartor_df = respuestas_df[['Nombre', 'Código', 'Inicio', 'Fin', 'Segundos', 'Nota']]
-    #py_collaboartor_df["Productividad"] = (py_collaboartor_df["Nota"] / (py_collaboartor_df["Segundos"] / 60))
+    # py_collaboartor_df = respuestas_df[['Nombre', 'Código', 'Inicio', 'Fin', 'Segundos', 'Nota']]
+    # py_collaboartor_df["Productividad"] = (py_collaboartor_df["Nota"] / (py_collaboartor_df["Segundos"] / 60))
 
     merge_df = merge_dataframes(py_collaboartor_df, respuestas_df, preguntas_df, hora_respuestas_df)
-
 
     salida_preg = []
     for i in range(0, len(preguntas_df), 4):
         salida_preg.append(ratio_preg(i, preguntas_df, merge_df, verbose=False))
 
-    diccionario = {}
-    diccionario["questions"] = salida_preg
-
+    diccionario = {"questions": salida_preg}
 
     with open('files/tool_output/07_acumulated_knowladge/outputRatioPreg.json', 'w', encoding='utf8') as outfile:
         json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
@@ -173,8 +171,7 @@ def run_script07():
     for i in range(len(merge_df)):
         salida.append(CA(i, merge_df))
 
-    diccionario = {}
-    diccionario["students"] = salida
+    diccionario = {"students": salida}
 
     with open('files/tool_output/07_acumulated_knowladge/outputCA.json', 'w', encoding='utf8') as outfile:
         json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)

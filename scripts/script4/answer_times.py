@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 
+
 def run_script04():
     # leemos nuestro maravilloso excel con toda la información
     calificaciones_df = pd.read_excel('files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx')
@@ -15,8 +16,8 @@ def run_script04():
     json_df['Hora'] = pd.to_datetime(json_df['Hora'])  # creamos el dataframe y asignamos la hora en formato datetime
 
     df_append = pd.DataFrame(columns=
-                            ['Nombre', 'Inicio', 'Q1_t', 'Q2_t', 'Q3_t', 'Q4_t',
-                            'Q5_t', 'Q6_t', 'Q7_t', 'Q8_t', 'Q9_t', 'Q10_t'])
+                             ['Nombre', 'Inicio', 'Q1_t', 'Q2_t', 'Q3_t', 'Q4_t',
+                              'Q5_t', 'Q6_t', 'Q7_t', 'Q8_t', 'Q9_t', 'Q10_t'])
 
     for i in range(0, calificaciones_df.shape[0]):
         nombre = calificaciones_df.iloc[i].Nombre
@@ -25,12 +26,12 @@ def run_script04():
         nota = calificaciones_df.iloc[i].Nota
 
         json_particular_df = json_df[(json_df['Hora'] >= inicio)
-                                    & (json_df['Hora'] <= fin)
-                                    & (json_df['Nombre'] == nombre)
-                                    & (json_df['Clase'] == "Cuestionario")
-                                    & ((json_df['Resumen'] == "Intento de cuestionario visualizado")
+                                     & (json_df['Hora'] <= fin)
+                                     & (json_df['Nombre'] == nombre)
+                                     & (json_df['Clase'] == "Cuestionario")
+                                     & ((json_df['Resumen'] == "Intento de cuestionario visualizado")
                                         | (json_df['Resumen'] == "Intento enviado"))
-                                    ]
+                                     ]
         # guardamos cuántas filas tenía antes de hacer el preprocesado.
         # Esto sirve para saber cuáles tenían > 10 visualizaciones de respuestas
         shape = (json_particular_df.shape[0] - 1)

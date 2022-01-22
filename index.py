@@ -9,7 +9,6 @@ from app import server
 # Connect to your app pages
 from apps import result
 
-
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div([

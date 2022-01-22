@@ -5,7 +5,6 @@ from datetime import datetime
 from scripts.script6.py_collaborator_outputs import NumpyEncoder
 
 
-
 def funcion(i, merge_df, preguntas_df):
     questions = {}
     preg = preguntas_df['Question'].iloc[i]
@@ -34,16 +33,16 @@ def funcion(i, merge_df, preguntas_df):
 
     return questions
 
+
 def run_script09():
-        preguntas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/all_questions.xlsx')
-        merge_df = pd.read_excel('files/tool_output/07_acumulated_knowladge/merge_df.xlsx')
+    preguntas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/all_questions.xlsx')
+    merge_df = pd.read_excel('files/tool_output/07_acumulated_knowladge/merge_df.xlsx')
 
-        salida_preg = []
-        for i in range(0, len(preguntas_df), 4):
-            salida_preg.append(funcion(i, merge_df, preguntas_df))
+    salida_preg = []
+    for i in range(0, len(preguntas_df), 4):
+        salida_preg.append(funcion(i, merge_df, preguntas_df))
 
-        diccionario = {}
-        diccionario["questions"] = salida_preg
+    diccionario = {"questions": salida_preg}
 
-        with open('files/tool_output/09_questions_mining/comportamientoPregunta.json', 'w', encoding='utf8') as outfile:
-            json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
+    with open('files/tool_output/09_questions_mining/comportamientoPregunta.json', 'w', encoding='utf8') as outfile:
+        json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)

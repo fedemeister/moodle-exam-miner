@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 import json
 
+
 class NumpyEncoder(json.JSONEncoder):
     """ Special json encoder for numpy types """
 
@@ -106,7 +107,6 @@ def function(i, columnas, py_cheat_df, respuestas_df, calificaciones_df, edge_li
 
 
 def run_script06():
-
     respuestas_df = pd.read_excel("files/tool_output/05_answers_and_questions_cleaned/answers_cleaned.xlsx")
     calificaciones_df = pd.read_excel("files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx")
     # hacer dataframe con "Inicio-Fin-Segundos-Nota"
@@ -120,11 +120,9 @@ def run_script06():
     for i in range(len(py_cheat_df)):
         salida.append(function(i, columnas, py_cheat_df, respuestas_df, calificaciones_df))
 
-    diccionario = {}
-    diccionario["students"] = salida
+    diccionario = {"students": salida}
 
     with open('files/tool_output/06_py_collaborator_outputs/new_output.json', 'w', encoding='utf8') as outfile:
         json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
 
-
-#run_script06()
+# run_script06()

@@ -11,7 +11,7 @@ def convert(o):  # hay que convertir los np.int64 a enteros porque np.int64 is n
 
 
 def cambiar_formato_fecha(fecha: str):
-    '''
+    """
     Devuelve un string en formato "dia mes año" para poder ser procesado por
     datetime.strptime con el siguiente formato datetime.strptime(fecha,"%d %m %Y %H:%M")
 
@@ -20,7 +20,7 @@ def cambiar_formato_fecha(fecha: str):
     Returns:
         fecha(str):Cadena de entrada donde han sido eliminado lo innecesario para ser procesado correctamente
         Ejemplo de salida --> 22 05 2020 11:23
-    '''
+    """
     # print(fecha)
     fecha = fecha.replace("de", "")
     fecha = fecha.replace("enero", "01")
@@ -44,7 +44,7 @@ def cambiar_formato_fecha(fecha: str):
 
 
 def duracion_a_segundos(fecha: str):
-    '''
+    """
     Devuelve un entero con la cantidad de segundos que han pasado entre el inicio y el fin del examen.
 
     Parameters:
@@ -54,7 +54,7 @@ def duracion_a_segundos(fecha: str):
             3 - "59 segundos"
     Returns:
         segundos(int):Duración en segundos de la cadena recibida correspondiente a la duración del examen
-    '''
+    """
     if 'minutos' in fecha and 'segundos' in fecha:  # Por ejemplo: "23 minutos 46 segundos"
         fecha = fecha.replace('minutos ', '')
         fecha = fecha.replace(' segundos', '')
@@ -69,25 +69,25 @@ def duracion_a_segundos(fecha: str):
 
 
 def formateo_json(my_json: list, devolver: bool = False):
-    '''
-    Formatea el JSON para dejarlo con las columnas de las notas en formato float, 
-    la columna de duración del examen como un número entero y las columnas de Inicio y Fin como datetime:    
+    """
+    Formatea el JSON para dejarlo con las columnas de las notas en formato float,
+    la columna de duración del examen como un número entero y las columnas de Inicio y Fin como datetime:
 
     Parameters:
         my_json (list): JSON sin procesar
     Returns:
         NO DEVUELVE NADA, MODIFICA EL JSON RECIBIDO
-    '''
+    """
     for alumno in my_json:
         if alumno[0] != 'Promedio general':
             for i in range(5, 7):
                 fecha = cambiar_formato_fecha(alumno[i])
                 alumno[i] = datetime.strptime(fecha, "%d %m %Y %H:%M")  # %d=22 %m=05 %Y=2020 %H=11:%M=23
-            alumno[4] = alumno[7] # guardamos los minutos y los segundos en ese formato para mostrarlos en el front final
+            alumno[4] = alumno[7]  # guardamos los minutos y los segundos en ese formato para mostrarlos en el front
             alumno[7] = duracion_a_segundos(alumno[7])
             if "SELECT" in alumno[9] or "FROM" in alumno[9] or "WHERE" in alumno[9] or "LIKE" in alumno[
                 9]:  # estamos en respuestas_json
-                if (alumno[8] == '-'):
+                if alumno[8] == '-':
                     alumno[8] = alumno[8].replace("-", "0.00")
                     alumno[8] = float(alumno[8])
                 else:
@@ -95,7 +95,7 @@ def formateo_json(my_json: list, devolver: bool = False):
                     alumno[8] = float(alumno[8])
             else:
                 for i in range(8, 19):
-                    if (alumno[i] == '-'):
+                    if alumno[i] == '-':
                         alumno[i] = alumno[i].replace("-", "0.00")
                         alumno[i] = float(alumno[i])
                     else:
@@ -104,7 +104,7 @@ def formateo_json(my_json: list, devolver: bool = False):
         else:
             for i in range(8, 19):
                 alumno[i] = alumno[i].replace(",", ".")
-    if devolver == True:
+    if devolver:
         return my_json
 
 
@@ -145,6 +145,7 @@ def execution():
     respuestas_df.sort_values(by=['Inicio', 'Fin'], inplace=True, ascending=True, ignore_index=True)
     respuestas_df.reindex(calificaciones_df.index)
     respuestas_df.to_excel('files/tool_output/03_anwers_and_califications_dataframe/answers.xlsx', index=False)
+
 
 def run_script03():
     execution()
