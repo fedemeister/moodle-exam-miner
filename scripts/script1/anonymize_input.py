@@ -95,7 +95,9 @@ def anonymizer() -> Tuple[List, List, List, List]:
 
     json_exam_marks = anonymize_others(json_exam_marks, name_user_dictionary)
     json_exam_marks = sorted(json_exam_marks, key=itemgetter(0))
-    promedio_general = get_promedio_general(json_exam_marks)  # lo elimina también de json_exam_marks
+
+    promedio_general = get_promedio_general(json_exam_marks)
+    json_exam_marks.pop(0)  # lo elimina también de json_exam_marks
 
     with codecs.open('files/tool_output/01_anonymized_input/exam_answers_utf8_anonymized.json', 'w',
                      encoding='utf-8') as f:
@@ -122,5 +124,4 @@ def get_promedio_general(json_exam_marks: List) -> List:
     """
     promedio_general = json_exam_marks[0]
     promedio_general = promedio_general[8:]
-    json_exam_marks.pop(0)
     return promedio_general
