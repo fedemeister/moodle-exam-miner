@@ -1,87 +1,126 @@
 import codecs
 import json
+from operator import itemgetter
+
+from typing import Tuple, List
 
 
-def anonymizer(reverse_log: bool = False):
+def anonymize_log(json_logs: List, name_user_dictionary: dict) -> List:
+    """
+        Anonymize the follow JSON file:
+        exam_logs_utf8.json
+
+        Parameters:
+            json_logs(List): JSON que contiene los logs de moodle
+            name_user_dictionary(dict): diccionario para anonimizar los campos
+
+        Returns:
+            json_logs: List
+    """
+    for entry in json_logs:
+        if entry[1] in name_user_dictionary:
+            entry[1] = name_user_dictionary.get(entry[1])
+        if entry[2] in name_user_dictionary:
+            entry[2] = name_user_dictionary.get(entry[2])
+    return json_logs
+
+
+def anonymize_others(json_answers_or_marks: List, name_user_dictionary: dict) -> List:
     """
         Anonymize the follow JSON files:
         exam_answers_utf8.json
         exam_califications_utf8.json
-        exam_logs_utf8.json
 
         Parameters:
-            reverse_log (bool): If True, the fuction reverse the JSON files
+            json_answers_or_marks(List): json que contiene los respuestas o notas del alumno
+            name_user_dictionary(dict): diccionario para anonimizar los campos
 
         Returns:
-            data(list of list): Same file as the input but anonymized.
+            json_answers_or_marks: List
+
+    """
+    for entry in json_answers_or_marks:
+        if (entry[1] + ' ' + entry[0]) in name_user_dictionary:
+            entry[1] = name_user_dictionary.get(entry[1] + ' ' + entry[0])
+            entry[0] = entry[1]
+            entry[2] = entry[1]
+            entry[3] = entry[1]
+
+    return json_answers_or_marks
+
+
+def anonymizer() -> Tuple[List, List, List, List]:
+    """
+        Ejecuta el script para anonimizar los JSON a través de la plataforma web
+            exam_answers_utf8.json
+            exam_califications_utf8.json
+            exam_logs_utf8.json
+
+        Returns:
+            Tuple[List, List, List, List]: json_logs, json_exam_answers, json_exam_marks, promedio_general
     """
 
     with open('files/tool_input/exam_answers_utf8.json', encoding='utf-8') as json_file:
         json_exam_answers = json.load(json_file)
 
     with open('files/tool_input/exam_califications_utf8.json', encoding='utf-8') as json_file:
-        json_exam_califications = json.load(json_file)
+        json_exam_marks = json.load(json_file)
 
     with open('files/tool_input/exam_logs_utf8.json', encoding='utf-8') as json_file:
         json_logs = json.load(json_file)
 
-        # this is because our json is a list of "list of lists" (three levels)
+    # this is because our json is a list of "list of lists" (three levels)
     json_exam_answers = json_exam_answers[0]
-    json_exam_califications = json_exam_califications[0]
+    json_exam_marks = json_exam_marks[0]
     json_logs = json_logs[0]
 
-    if reverse_log == True:
-        json_logs = json_logs[::-1]  # reversing log
-        json_exam_califications = json_exam_califications[::-1]
+    list_unique_names = [(i[1] + ' ' + i[0]) for i in json_exam_answers]  # i[1] is the name
 
-    set_unique_names = {(i[1]) for i in json_logs}  # i[1] is the name
-
-    # let's create a list with numbers between 0 to input unique names lenght.
-    number_list = [*range(len(set_unique_names))]
+    # let's create a list with numbers between 0 to input unique names length.
+    number_list = [*range(len(list_unique_names))]
 
     # for every number there, we put a number at the end of the 'user' word.
     user_number_list = list(map(lambda number: 'user' + str(number), number_list))
 
-    if len(number_list) == len(set_unique_names):
-        name_user_dictionary = dict(zip(set_unique_names, user_number_list))
-        with codecs.open('files/tool_output/01_anonymized_input/name_user_dictionary.json', 'w', encoding='utf-8') as f:
-            json.dump(name_user_dictionary, f, ensure_ascii=False, indent=2)
+    name_user_dictionary = dict(zip(list_unique_names, user_number_list))
+    with codecs.open('files/tool_output/01_anonymized_input/name_user_dictionary.json', 'w', encoding='utf-8') as f:
+        json.dump(name_user_dictionary, f, ensure_ascii=False, indent=2)
 
-            # df = pd.read_json ('files/tool_output/01_anonymized_input/name_user_dictionary.json', encoding='utf-8')
-        # df.to_csv ('files/tool_output/01_anonymized_input/name_user_dictionary.csv', index = None)
+    # anonymize json files
+    json_logs = anonymize_log(json_logs, name_user_dictionary)
+    json_logs = json_logs[::-1]  # reversing log to order it
 
-    # anonymizing json files
-    for entry in json_logs:
-        if entry[1] in name_user_dictionary:
-            entry[1] = name_user_dictionary.get(entry[1])
-        if entry[2] in name_user_dictionary:
-            entry[2] = name_user_dictionary.get(entry[2])
+    json_exam_answers = anonymize_others(json_exam_answers, name_user_dictionary)
+    json_exam_answers = sorted(json_exam_answers, key=itemgetter(0))
 
-    for entry in json_exam_answers:
-        if (entry[1] + ' ' + entry[0]) in name_user_dictionary:
-            entry[1] = name_user_dictionary.get(entry[1] + ' ' + entry[0])
-            entry[0] = entry[1]
-            entry[2] = entry[1]
-            entry[3] = entry[1]
+    json_exam_marks = anonymize_others(json_exam_marks, name_user_dictionary)
+    json_exam_marks = sorted(json_exam_marks, key=itemgetter(0))
+    promedio_general = get_promedio_general(json_exam_marks)  # lo elimina también de json_exam_marks
 
-    for entry in json_exam_califications:
-        if (entry[1] + ' ' + entry[0]) in name_user_dictionary:
-            entry[1] = name_user_dictionary.get(entry[1] + ' ' + entry[0])
-            entry[0] = entry[1]
-            entry[2] = entry[1]
-            entry[3] = entry[1]
     with codecs.open('files/tool_output/01_anonymized_input/exam_answers_utf8_anonymized.json', 'w',
                      encoding='utf-8') as f:
         json.dump(json_exam_answers, f, ensure_ascii=False, indent=2)
 
     with codecs.open('files/tool_output/01_anonymized_input/exam_califications_utf8_anonymized.json', 'w',
                      encoding='utf-8') as f:
-        json.dump(json_exam_califications, f, ensure_ascii=False, indent=2)
+        json.dump(json_exam_marks, f, ensure_ascii=False, indent=2)
 
     with codecs.open('files/tool_output/01_anonymized_input/exam_logs_utf8_anonymized.json', 'w',
                      encoding='utf-8') as f:
         json.dump(json_logs, f, ensure_ascii=False, indent=2)
 
+    return json_logs, json_exam_answers, json_exam_marks, promedio_general
 
-def run_script01():
-    anonymizer(reverse_log=True)
+
+def get_promedio_general(json_exam_marks: List) -> List:
+    """
+        Obtiene el promedio general de notas y elimina ese valor del conjunto de notas de los alumnos
+
+        Returns:
+            List: promedio_general. La primera posición es la nota del examen y las demás posiciones es una por cada pregunta del examen
+
+    """
+    promedio_general = json_exam_marks[0]
+    promedio_general = promedio_general[8:]
+    json_exam_marks.pop(0)
+    return promedio_general
