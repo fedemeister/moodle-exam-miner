@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 
-def run_script04() -> pd.DataFrame:
+def get_answer_times_df(marks_df, log_json) -> pd.DataFrame:
     """
     Script para obtener un dataframe con el minuto en el que el estudiante respondió a cada pregunta durante el examen.
     El proceso es sencillo, obtenemos los datos a través del log de interacciones durante el proceso que dura el examen
@@ -12,11 +12,11 @@ def run_script04() -> pd.DataFrame:
     Returns: df_answer_times: Dataframe que contiene las horas de respuesta para cada pregunta por cada estudiante.
 
     """
-    marks_df = pd.read_excel('files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx')
+    # marks_df = pd.read_excel('files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx')
 
     # leemos el log durante el examen
-    with open('files/tool_output/01_anonymized_input/exam_logs_utf8_anonymized.json', encoding='utf-8') as json_file:
-        log_json = json.load(json_file)
+    # with open('files/tool_output/01_anonymized_input/exam_logs_utf8_anonymized.json', encoding='utf-8') as json_file:
+    #    log_json = json.load(json_file)
 
     json_df = pd.DataFrame(log_json)
     json_df.columns = ['Hora', 'Nombre', 'Nombre_aux', 'Tipo', 'Clase', 'Resumen', 'Descripción', 'Web', 'IP']
@@ -76,5 +76,11 @@ def run_script04() -> pd.DataFrame:
             + str(name) + '_' + str(mark) + "#" + str(n_rows) + '.xlsx', index=False)
 
     df_answer_times.reset_index(drop=True, inplace=True)
+
+    df_answer_times[['Inicio', 'Q1_t', 'Q2_t', 'Q3_t', 'Q4_t', 'Q5_t', 'Q6_t', 'Q7_t', 'Q8_t', 'Q9_t', 'Q10_t']] = \
+        df_answer_times[
+            ['Inicio', 'Q1_t', 'Q2_t', 'Q3_t', 'Q4_t', 'Q5_t', 'Q6_t', 'Q7_t', 'Q8_t', 'Q9_t', 'Q10_t']].apply(
+            pd.to_datetime)
+
     df_answer_times.to_excel('files/tool_output/04_answers_time/answer_times_merged.xlsx')
     return df_answer_times
