@@ -1,16 +1,19 @@
+from typing import Tuple
+
 import numpy as np  # linear algebra
 import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 import csv
 
 
-def convert(o):  # hay que convertir los np.int64 a enteros porque np.int64 is not JSON serializable
-    if isinstance(o, np.int64): return int(o)
+def convert(o) -> int:  # hay que convertir los np.int64 a enteros porque np.int64 is not JSON serializable
+    if isinstance(o, np.int64):
+        return int(o)
     raise TypeError
 
 
-def cambiar_formato_fecha(fecha: str):
+def cambiar_formato_fecha(fecha: str) -> str:
     """
     Devuelve un string en formato "dia mes año" para poder ser procesado por
     datetime.strptime con el siguiente formato datetime.strptime(fecha,"%d %m %Y %H:%M")
@@ -43,7 +46,7 @@ def cambiar_formato_fecha(fecha: str):
     return fecha
 
 
-def duracion_a_segundos(fecha: str):
+def duracion_a_segundos(fecha: str) -> int:
     """
     Devuelve un entero con la cantidad de segundos que han pasado entre el inicio y el fin del examen.
 
@@ -68,15 +71,16 @@ def duracion_a_segundos(fecha: str):
     return int(segundos)
 
 
-def formateo_json(my_json: list, devolver: bool = False):
+def formateo_json(my_json: list, devolver: bool = False) -> list:
     """
     Formatea el JSON para dejarlo con las columnas de las notas en formato float,
     la columna de duración del examen como un número entero y las columnas de Inicio y Fin como datetime:
 
     Parameters:
+        devolver (bool): Si es True: devuelve el json formateado por parámetro
         my_json (list): JSON sin procesar
     Returns:
-        NO DEVUELVE NADA, MODIFICA EL JSON RECIBIDO
+        NO DEVUELVE NADA, MODIFICA EL JSON RECIBIDO si "devolver" es False
     """
     for alumno in my_json:
         if alumno[0] != 'Promedio general':
@@ -85,8 +89,8 @@ def formateo_json(my_json: list, devolver: bool = False):
                 alumno[i] = datetime.strptime(fecha, "%d %m %Y %H:%M")  # %d=22 %m=05 %Y=2020 %H=11:%M=23
             alumno[4] = alumno[7]  # guardamos los minutos y los segundos en ese formato para mostrarlos en el front
             alumno[7] = duracion_a_segundos(alumno[7])
-            if "SELECT" in alumno[9] or "FROM" in alumno[9] or "WHERE" in alumno[9] or "LIKE" in alumno[
-                9]:  # estamos en respuestas_json
+            if "SELECT" in alumno[9] or "FROM" in alumno[9] or "WHERE" in alumno[9] or "LIKE" in alumno[9]:
+                # estamos en respuestas_json
                 if alumno[8] == '-':
                     alumno[8] = alumno[8].replace("-", "0.00")
                     alumno[8] = float(alumno[8])
@@ -115,7 +119,15 @@ def guardar_json_formateado_csv(data: list):
             csv_writer.writerow(data[i])
 
 
-def execution():
+def json_to_dataframe_and_excel(my_json: list, my_columns: list, name: str) -> pd.DataFrame:
+    df = pd.DataFrame(my_json)
+    df.columns = my_columns
+    df.sort_values(by=['Inicio', 'Fin'], inplace=True, ascending=True, ignore_index=True)
+    df.to_excel('files/tool_output/03_anwers_and_califications_dataframe/' + str(name) + '.xlsx', index=False)
+    return df
+
+
+def create_marks_and_answers_df() -> Tuple[pd.DataFrame, pd.DataFrame]:
     columnas = ['Apellidos', 'Nombre', 'Código', 'Email', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota',
                 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10']
 
@@ -129,23 +141,6 @@ def execution():
     calificaciones_json = formateo_json(calificaciones_json, devolver=True)
     respuestas_json = formateo_json(respuestas_json, devolver=True)
 
-    np_array_promedio = np.array(calificaciones_json[len(calificaciones_json) - 1][8:19])
-    np_array_promedio = np_array_promedio.astype(np.float64)
-
-    calificaciones_df = pd.DataFrame(calificaciones_json)
-    calificaciones_df.columns = columnas
-    calificaciones_df.drop(calificaciones_df[calificaciones_df['Apellidos'] == "Promedio general"].index, inplace=True)
-    calificaciones_df.drop(calificaciones_df[calificaciones_df['Código'] == "0002760"].index, inplace=True)
-    calificaciones_df.sort_values(by=['Inicio', 'Fin'], inplace=True, ascending=True, ignore_index=True)
-    calificaciones_df.to_excel('files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx', index=False)
-
-    respuestas_df = pd.DataFrame(respuestas_json)
-    respuestas_df.columns = columnas
-    respuestas_df.drop(respuestas_df[respuestas_df['Código'] == "0002760"].index, inplace=True)
-    respuestas_df.sort_values(by=['Inicio', 'Fin'], inplace=True, ascending=True, ignore_index=True)
-    respuestas_df.reindex(calificaciones_df.index)
-    respuestas_df.to_excel('files/tool_output/03_anwers_and_califications_dataframe/answers.xlsx', index=False)
-
-
-def run_script03():
-    execution()
+    marks_df = json_to_dataframe_and_excel(calificaciones_json, columnas, 'marks')
+    answers_df = json_to_dataframe_and_excel(respuestas_json, columnas, 'answers')
+    return marks_df, answers_df
