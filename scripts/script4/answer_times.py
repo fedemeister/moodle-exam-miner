@@ -69,7 +69,7 @@ def run_script04() -> pd.DataFrame:
         json_T.insert(1, "Inicio", [start])
         json_T.reset_index(drop=True, inplace=True)
 
-        df_answer_times = df_answer_times.append(json_T)
+        df_answer_times = pd.concat([df_answer_times, json_T])
 
         json_T.to_excel(
             'files/tool_output/04_answers_time/individual_answer_times/'
@@ -77,3 +77,4 @@ def run_script04() -> pd.DataFrame:
 
     df_answer_times.reset_index(drop=True, inplace=True)
     df_answer_times.to_excel('files/tool_output/04_answers_time/answer_times_merged.xlsx')
+    return df_answer_times
