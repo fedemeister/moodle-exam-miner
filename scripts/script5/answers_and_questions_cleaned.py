@@ -1,15 +1,9 @@
+from typing import Tuple
+
 import pandas as pd
 
 
-# Esta función imprime la localización de la fila y su contenido
-# me sirve para buscar rápidamente cuál es y poder ver el contenido
-# y arreglar por qué no es igual que en el otro conjunto
-def imprimir_dataframe(dataframe, column):
-    for i in range(0, len(dataframe)):
-        print(str(i), dataframe[str(column)].iloc[i])
-
-
-def limpiar_respuestas_df(df, Q):
+def limpiar_respuestas_df(df: pd.DataFrame, Q: int):
     df['Q' + str(Q)] = df['Q' + str(Q)].str.strip()
     df['Q' + str(Q)] = df['Q' + str(Q)].replace(['\\n'], ' ', regex=True)
     df['Q' + str(Q)] = df['Q' + str(Q)].replace(['\\t\t'], ' ', regex=True)
@@ -23,14 +17,14 @@ def limpiar_respuestas_df(df, Q):
     df.to_excel('files/tool_output/05_answers_and_questions_cleaned/answers_cleaned.xlsx', index=False)
 
 
-def run_script05():
-    respuestas_df = pd.read_excel('files/tool_output/03_anwers_and_califications_dataframe/answers.xlsx')
-    df_todas_preguntas = pd.read_excel('files/tool_output/02_questions_and_answers_set/raw_quest_answ_output.xlsx')
+def run_script05(respuestas_df, df_todas_preguntas) -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
+    # respuestas_df = pd.read_excel('files/tool_output/03_anwers_and_califications_dataframe/answers.xlsx')
+    # df_todas_preguntas = pd.read_excel('files/tool_output/02_questions_and_answers_set/raw_quest_answ_output.xlsx')
     # Nos quedamos con un conjunto único de respuestas, es decir, quiero que salgan todas pero ninguna repetida.
     for i in range(1, 11):
         limpiar_respuestas_df(respuestas_df, i)
 
-    respuestas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/answers_cleaned.xlsx')
+    # respuestas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/answers_cleaned.xlsx')
 
     respuestas = []
     for i in range(1, 11):
@@ -40,7 +34,7 @@ def run_script05():
     flat_list = [item for sublist in respuestas for item in sublist]
     flat_list = list(dict.fromkeys(flat_list))  # eliminamos duplicados
     # len(flat_list)
-    df_respuestas = pd.DataFrame(flat_list, columns=['Answer'])
+    answer_Series = pd.DataFrame(flat_list, columns=['Answer'])
 
     df_todas_preguntas['Answer'] = df_todas_preguntas['Answer'].str.strip()
     df_todas_preguntas['Answer'] = df_todas_preguntas['Answer'].replace(['<p> '], '', regex=True)
@@ -92,8 +86,9 @@ def run_script05():
                                                                         regex=True)
 
     # cuando una respuesta no está en el conjunto global de respuestas nos quedamos con ella
-    df_check = df_respuestas.Answer.isin(df_todas_preguntas.Answer).astype(int)
+    df_check = answer_Series.Answer.isin(df_todas_preguntas.Answer).astype(int)
     # print(df_check[df_check == 0].shape[0]) #aquí mostramos cuánta cantidad hay.
     # En nuestro ejemplo hay 1 que no cuadra, la respuesta en blanco: "-"
     df_todas_preguntas.to_excel('files/tool_output/05_answers_and_questions_cleaned/all_questions.xlsx', index=False)
-    df_respuestas.to_excel('files/tool_output/05_answers_and_questions_cleaned/df_respuestas.xlsx', index=False)
+    answer_Series.to_excel('files/tool_output/05_answers_and_questions_cleaned/df_respuestas.xlsx', index=False)
+    return df_todas_preguntas, df_check, answer_Series
