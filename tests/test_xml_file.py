@@ -4,6 +4,13 @@ import pytest
 import pandas as pd
 from numpy import nan
 
+from scripts.script3.answers_and_califications_dataframe import create_marks_and_answers_df
+from tests.fixtures_global.fixtures_global import fixture_raw_xml_dataframe
+from tests.fixtures_global.fixtures_global import fixture_xml_dataframe_with_answers_from_answers_df
+from tests.fixtures_global.fixtures_global import fixture_json_answers_formatted_df
+from scripts.script5.answers_and_questions_cleaned import run_script05
+from scripts.script2.questions import run_script02
+
 
 @pytest.fixture(scope='module')
 def df_raw():
@@ -432,3 +439,21 @@ def test_get_multichoice_dataframe(df_raw):
     actual = scripts.script2.questions.get_just_multichoice_dataframe(df_raw)
     expected = df_raw[df_raw['@type'] == 'multichoice'].reset_index(drop=True)
     pd.testing.assert_frame_equal(actual, expected)
+
+
+def test_answers_in_answers_df_are_in_the_xml(fixture_raw_xml_dataframe,
+                                              fixture_json_answers_formatted_df,
+                                              fixture_xml_dataframe_with_answers_from_answers_df):
+    actual, nothing1, nothing2 = run_script05(fixture_json_answers_formatted_df, fixture_raw_xml_dataframe)
+    expected = fixture_xml_dataframe_with_answers_from_answers_df
+    pd.testing.assert_frame_equal(actual, expected)
+
+
+def test_data_in_answers_df_are_also_in_the_xml_using_dfcheck_variable_and_outputs_from_previous_scripts():
+    df_xml_output = run_script02()
+    marks_df, answers_df = create_marks_and_answers_df()
+    df_todas_preguntas, df_check, nothing = run_script05(answers_df, df_xml_output)
+
+    actual = df_check[df_check == 0].shape[0]
+    expected = 0
+    assert actual == expected
