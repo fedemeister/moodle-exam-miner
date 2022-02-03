@@ -3931,3 +3931,197 @@ def fixture_df_answer_times_anonymized():
          Timestamp('2020-05-22 13:08:00'), Timestamp('2020-05-22 13:09:00'), Timestamp('2020-05-22 13:12:00'),
          Timestamp('2020-05-22 13:13:00'), Timestamp('2020-05-22 13:14:00'), Timestamp('2020-05-22 13:19:00')]
     ], columns=columns)
+
+
+@pytest.fixture(scope='session')
+def fixture_answers_df_cleaned_anonymized():
+    columnas = ['Apellidos', 'Nombre', 'Código', 'Email', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota',
+                'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10']
+    return pd.DataFrame([
+        [
+            'user1',
+            'user1',
+            'user1',
+            'user1',
+            '22 minutos 31 segundos',
+            Timestamp('2020-05-22 11:00:00'),
+            Timestamp('2020-05-22 11:22:00'),
+            1351,
+            8.75,
+            'SELECT * FROM socios WHERE telefono IS NOT NULL;',
+            'SELECT * FROM socios ORDER BY3, 4, 2;',
+            '"SELECT COUNT(apellido2) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(telefono) FROM socios;"',
+            '... GROUP BY autor_id HAVING COUNT(*) >=ALL (SELECT COUNT(*) FROM libros GROUP BY autor_id));',
+            "SELECT * FROM libros WHERE autor_id NOT IN (SELECT id FROM autores WHERE nombre = 'María' AND apellido1 = 'Dueñas' AND apellido2 = 'Vinuesa');",
+            "... WHERE id NOT IN (SELECT socio_id FROM prestamos WHERE libro_id IN (SELECT id FROM libros WHERE titulo LIKE 'Harry Potter%'));",
+            '...WHERE a.id = l.autor_id AND l.id = p.libro_id;',
+            "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto';",
+            '... FROM socios s LEFT OUTER JOIN prestamos p ON p.socio_id = s.id LEFT OUTER JOIN libros l ON p.libro_id = l.id GROUP BY s.id, s.nombre, s.apellido1;',
+            "INSERT INTO socios VALUES (NULL, 'Angel', 'López', NULL, '656789456');"
+        ],
+        [
+            'user0',
+            'user0',
+            'user0',
+            'user0',
+            '23 minutos 46 segundos',
+            Timestamp('2020-05-22 11:00:00'),
+            Timestamp('2020-05-22 11:23:00'),
+            1426,
+            8.75,
+            "SELECT * FROM socios WHERE nombre not LIKE 'J%' AND nombre LIKE '%m%';",
+            'SELECT DISTINCT nacionalidad FROM autores ORDER BY 1 DESC;', '10, 10, 7',
+            '...GROUP BY autor_id HAVING AVG(paginas) >=ALL (SELECT AVG(paginas) FROM libros GROUP BY autor_id));',
+            "SELECT * FROM libros WHERE autor_id NOT IN (SELECT id FROM autores WHERE nacionalidad = 'Gran Bretaña');",
+            '... WHERE id NOT IN (SELECT libro_id FROM prestamos);',
+            '... WHERE s.id = socio_id AND l.id = libro_id GROUP BY s.idHAVINGDATEDIFF(p.fecha_fin, p.fecha) > 15;',
+            "SELECT A.nombre, A.apellido1, sum(L.paginas) 'Paginas' FROM autores A, libros L WHERE A.id = L.autor_id GROUP BY A.nombre, A.apellido1;",
+            '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id GROUP BY s.id;',
+            "UPDATE socios SET apellido1='García' WHERE id=14;"
+        ],
+        [
+            'user2',
+            'user2',
+            'user2',
+            'user2',
+            '14 minutos 13 segundos',
+            Timestamp('2020-05-22 11:59:00'),
+            Timestamp('2020-05-22 12:14:00'),
+            853,
+            2.5,
+            'SELECT * FROM socios WHERE telefono IS NOT NULL;',
+            'SELECT * FROM socios ORDER BY nombre DESC, id ASC;',
+            '"SELECT COUNT(*) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(id) FROM socios;"',
+            '... HAVING COUNT(*) <=ALL (SELECT count(*) FROM prestamos GROUP BY libro_id));',
+            "SELECT * FROM libros WHERE autor_id NOT IN (SELECT id FROM autores WHEREnacionalidad LIKE ('Gran Bretaña', 'España'));",
+            '... WHERE EXISTS (SELECT libro_id FROM prestamos);',
+            '... WHERE s.id = socio_id AND l.id = libro_id GROUP BY s.id, s.nombre, s.apellido1 HAVING AVG(DATEDIFF(p.fecha_fin, p.fecha)) > 15;',
+            "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;",
+            '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;',
+            "INSERT INTO socios (id, nombre, apellido1, apellido2) VALUES (NULL, 'Angel', 'López', 'Romero');"],
+        [
+            'user3',
+            'user3',
+            'user3',
+            'user3',
+            '22 minutos 20 segundos',
+            Timestamp('2020-05-22 12:57:00'),
+            Timestamp('2020-05-22 13:19:00'),
+             1340,
+             5.0,
+            "SELECT * FROM socios WHERE nombre not LIKE 'J%' AND nombre LIKE '%m%';",
+            'SELECT DISTINCT nacionalidad FROM autores ORDER BY 1;',
+            '"SELECT COUNT(apellido1) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(apellido2) FROM socios;"',
+            '... GROUP BY A1.nombre, A1.apellido1, A1.nacionalidad HAVING COUNT(*) <=ALL (SELECT COUNT(*) FROM autores A2, libros L2 WHERE A2.id = L2.autor_id GROUP BY A2.nombre, A2.apellido1, A2.nacionalidad) AND A1.nacionalidad = A2.nacionalidad;',
+            "SELECT * FROM libros WHERE autor_id IN (SELECT id FROM autores WHERE nombre = 'María' AND apellido1 = 'Dueñas' AND apellido2 = 'Vinuesa');",
+            "... WHERE id NOT IN (SELECT socio_id FROM prestamos WHERE libro_id IN (SELECT id FROM libros WHERE titulo LIKE 'Harry Potter%'));",
+            "... GROUP BY a.nombre, a.apellido1 HAVINGa.id = l.autor_id AND l.id = p.libro_id ANDa.nacionalidad = 'Gran Bretaña' ;",
+            "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;",
+            '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;',
+             'DELETE FROM socios WHERE id=14;'
+         ]
+    ], columns=columnas)
+
+
+@pytest.fixture(scope='session')
+def fixture_py_collaborator_anonymized():
+    return \
+        {'students': [
+            {
+                'student_id': 'user1',
+                'start': Timestamp('2020-05-22 11:00:00'),
+                'end': Timestamp('2020-05-22 11:22:00'),
+                'time_seconds': 1351,
+                'grade': 8.75,
+                'productividad': 0.38860103626943004,
+                'answers': []
+            },
+            {
+                'student_id': 'user0',
+                'start': Timestamp('2020-05-22 11:00:00'),
+                'end': Timestamp('2020-05-22 11:23:00'),
+                'time_seconds': 1426,
+                'grade': 8.75,
+                'productividad': 0.36816269284712483,
+                'answers': []
+            },
+            {
+                'student_id': 'user2',
+                'start': Timestamp('2020-05-22 11:59:00'),
+                'end': Timestamp('2020-05-22 12:14:00'),
+                'time_seconds': 853,
+                'grade': 2.5,
+                'productividad': 0.17584994138335286,
+                'answers': []
+            },
+            {
+                'student_id': 'user3',
+                'start': Timestamp('2020-05-22 12:57:00'),
+                'end': Timestamp('2020-05-22 13:19:00'),
+                'time_seconds': 1340,
+                'grade': 5.0,
+                'productividad': 0.22388059701492538,
+                'answers': [
+                    {
+                        'question_id': 8,
+                        'text': "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;",
+                        'score': -0.25,
+                        'counter': 1,
+                        'suspects': ['user2']
+                     },
+                    {
+                        'question_id': 9,
+                        'text': '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;',
+                        'score': 1.0,
+                        'counter': 1,
+                        'suspects': ['user2']
+                     }
+                ]
+            }
+        ]}
+
+
+@pytest.fixture(scope='session')
+def fixture_py_cheat_df_anonymized():
+    columnas = ["Nombre", "Código", "Tiempo", "Inicio", "Fin", "Segundos", "Nota", "Productividad"]
+    return pd.DataFrame([
+        [
+            'user1',
+            'user1',
+            '22 minutos 31 segundos',
+            Timestamp('2020-05-22 11:00:00'),
+            Timestamp('2020-05-22 11:22:00'),
+            1351,
+            8.75,
+            0.38860103626943004
+        ],
+        [
+            'user0',
+            'user0',
+            '23 minutos 46 segundos',
+            Timestamp('2020-05-22 11:00:00'),
+            Timestamp('2020-05-22 11:23:00'),
+            1426,
+            8.75,
+            0.36816269284712483
+        ],
+        [
+            'user2',
+            'user2',
+            '14 minutos 13 segundos',
+            Timestamp('2020-05-22 11:59:00'),
+            Timestamp('2020-05-22 12:14:00'),
+            853,
+            2.5,
+            0.17584994138335286
+        ],
+        [
+            'user3',
+            'user3',
+            '22 minutos 20 segundos',
+            Timestamp('2020-05-22 12:57:00'),
+            Timestamp('2020-05-22 13:19:00'),
+            1340,
+            5.0,
+            0.22388059701492538]
+    ], columns=columnas)
