@@ -230,12 +230,12 @@ def run_script07(answers_df_cleaned, df_xml_cleaned, answer_times_merged_df, py_
 
 def merge_df_columns_to_datetime64(merge_df):
     """
-
+    Función que cambia las columnas con formato object a datetime64 para mayor precisión
     Args:
-        merge_df:
+        merge_df: Dataframe con todos los datos que vamos a consultar para acceder únicamente a un dataframe.
 
     Returns:
-
+        merge_df con las columnas _t en formato datetime.
     """
     merge_df['Q0_t'] = pd.to_datetime(merge_df['Q0_t'])
     merge_df['Q1_t'] = pd.to_datetime(merge_df['Q1_t'])
