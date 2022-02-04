@@ -2241,3 +2241,44 @@ def fixture_xml_dataframe_with_answers_from_answers_df():
         ['T5 - update 01', "UPDATE socios SET apellido1='García' WHERE id=14;", 1.0],
         ['T5 - update 02', "UPDATE socios SET apellido1='García' WHERE id=14;", -0.25]
     ], columns=columns)
+
+
+@pytest.fixture(scope='session')
+def fixture_ratio_pregunta():
+    return {
+        'questions':
+            [
+                {},
+                {}, {'preg': 'T1 - simple - LIKE 3',
+                     'lista_c': ["SELECT * FROM socios WHERE nombre not LIKE 'J%' AND nombre LIKE '%m%';"],
+                     'lista_i': [], 'count_correctas': 2, 'count_incorrectas': 0, 'porcentaje_acertadas': 1.0}, {}, {},
+                {}, {'preg': 'T1 - simple - NULL 2', 'lista_c': ['SELECT * FROM socios WHERE telefono IS NOT NULL;'],
+                     'lista_i': [], 'count_correctas': 2, 'count_incorrectas': 0, 'porcentaje_acertadas': 1.0}, {}, {},
+                {}, {}, {'preg': 'T1 - simple - DISTINCT 10',
+                         'lista_c': ['SELECT DISTINCT nacionalidad FROM autores ORDER BY 1 DESC;'],
+                         'lista_i': ['SELECT DISTINCT nacionalidad FROM autores ORDER BY 1;'], 'count_correctas': 1,
+                         'count_incorrectas': 1, 'porcentaje_acertadas': 0.5}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
+                {}, {}, {}, {}, {}, {'preg': 'T2 - funciones - count 6', 'lista_c': [
+                '"SELECT COUNT(apellido2) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(telefono) FROM socios;"'],
+                                     'lista_i': [
+                                         '"SELECT COUNT(*) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(id) FROM socios;"'],
+                                     'count_correctas': 1, 'count_incorrectas': 1, 'porcentaje_acertadas': 0.5}, {}, {},
+                {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
+                {'preg': 'T4 - multiples group by 06 o anidadas', 'lista_c': [
+                    "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto';"],
+                 'lista_i': [
+                     "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;"],
+                 'count_correctas': 1, 'count_incorrectas': 2, 'porcentaje_acertadas': 0.3333333333333333}, {}, {}, {},
+                {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {'preg': 'T3 - exists - correlacionadas 06',
+                                                                         'lista_c': [
+                                                                             "... WHERE id NOT IN (SELECT socio_id FROM prestamos WHERE libro_id IN (SELECT id FROM libros WHERE titulo LIKE 'Harry Potter%'));"],
+                                                                         'lista_i': [], 'count_correctas': 2,
+                                                                         'count_incorrectas': 0,
+                                                                         'porcentaje_acertadas': 1.0}, {}, {}, {}, {},
+                {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {'preg': 'T4 - otros 05', 'lista_c': [
+                '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;'], 'lista_i': [],
+                                                                 'count_correctas': 2, 'count_incorrectas': 0,
+                                                                 'porcentaje_acertadas': 1.0}, {}, {}, {}, {}, {}, {},
+                {}, {}, {}, {}, {}, {}, {}
+            ]
+    }
