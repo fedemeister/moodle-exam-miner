@@ -1,14 +1,19 @@
-import pandas as pd
-import json
-import numpy as np
-from datetime import datetime
-from scripts.script6.py_collaborator_outputs import NumpyEncoder
+from typing import Dict
 
 
-def funcion(i, merge_df, preguntas_df):
-    questions = {}
+def question_mining(i, merge_df, preguntas_df) -> Dict:
+    """
+    Función que crea una entrada con los datos de la pregunta en curso que se encuentran en merge_df
+    Args:
+        i: iteración (comportamiento_preguntas.append(question_mining(i, merge_df, df_xml_cleaned))
+        merge_df: Dataframe con todos los datos que vamos a consultar para acceder únicamente a un dataframe.
+        preguntas_df: Pandas dataframe con las preguntas y respuestas del examen después de la limpieza
+
+    Returns:
+        Datos para la pregunta_sub_i
+    """
+    iteracion = {}
     preg = preguntas_df['Question'].iloc[i]
-    lista = []
     for x in range(1, 11):
         len_p = len(merge_df['Q' + str(x) + '_q'][merge_df['Q' + str(x) + '_q'] == preg])
         if len_p > 1:
@@ -23,26 +28,31 @@ def funcion(i, merge_df, preguntas_df):
             len_c = len(lista_c)
             len_i = len(lista_i)
 
-            questions['pregunta'] = preg
-            questions['porcentaje_acertadas'] = (len_c / len_p)
-            questions['calificaciones'] = lista
-            questions['horas'] = lista_horas
-            questions['respuestas'] = lista_resp
-            questions['count_correctas'] = len_c
-            questions['count_incorrectas'] = len_i
+            iteracion['pregunta'] = preg
+            iteracion['porcentaje_acertadas'] = (len_c / len_p)
+            iteracion['calificaciones'] = lista
+            iteracion['horas'] = lista_horas
+            iteracion['respuestas'] = lista_resp
+            iteracion['count_correctas'] = len_c
+            iteracion['count_incorrectas'] = len_i
 
-    return questions
+    return iteracion
 
 
-def run_script09():
-    preguntas_df = pd.read_excel('files/tool_output/05_answers_and_questions_cleaned/all_questions.xlsx')
-    merge_df = pd.read_excel('files/tool_output/07_acumulated_knowladge/merge_df.xlsx')
+def run_script09(df_xml_cleaned, merge_df) -> Dict:
+    """
+    Función que genera un archivo con el comportamiento de cada pregunta
+    Args:
+        df_xml_cleaned: Pandas dataframe con las preguntas y respuestas del examen después de la limpieza
+        merge_df: Dataframe con todos los datos que vamos a consultar para acceder únicamente a un dataframe.
 
-    salida_preg = []
-    for i in range(0, len(preguntas_df), 4):
-        salida_preg.append(funcion(i, merge_df, preguntas_df))
+    Returns:
+        comportamiento_preguntas
+    """
+    comportamiento_preguntas = []
+    for i in range(0, len(df_xml_cleaned), 4):
+        comportamiento_preguntas.append(question_mining(i, merge_df, df_xml_cleaned))
 
-    diccionario = {"questions": salida_preg}
+    comportamiento_preguntas = {"questions": comportamiento_preguntas}
 
-    with open('files/tool_output/09_questions_mining/comportamientoPregunta.json', 'w', encoding='utf8') as outfile:
-        json.dump(diccionario, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
+    return comportamiento_preguntas

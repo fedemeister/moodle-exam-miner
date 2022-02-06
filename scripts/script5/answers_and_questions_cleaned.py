@@ -102,6 +102,5 @@ def run_script05(answers_df: pd.DataFrame, df_xml_output: pd.DataFrame) -> Tuple
     # cuando una respuesta no está en el conjunto global de respuestas nos quedamos con ella
     # df_check guarda las respuestas que están o no están en el fichero xml ya limpio: 1 sí está, 0 no está
     df_check = answer_Series.Answer.isin(df_xml_output.Answer).astype(int)
-    # print(df_check[df_check == 0].shape[0]) #aquí mostramos cuánta cantidad hay.
 
     return df_xml_cleaned, df_check, answers_df_cleaned

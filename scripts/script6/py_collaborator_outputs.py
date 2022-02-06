@@ -1,27 +1,7 @@
-from typing import Union, Any, Tuple, Dict, List
+from typing import Tuple, Dict, List
 
-import numpy as np  # linear algebra
-import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+import pandas as pd
 from datetime import datetime
-import json
-
-
-class NumpyEncoder(json.JSONEncoder):
-    """ Special json encoder for numpy types """
-
-    def default(self, obj):
-        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
-                            np.int16, np.int32, np.int64, np.uint8,
-                            np.uint16, np.uint32, np.uint64)):
-            return int(obj)
-        elif isinstance(obj, (np.float_, np.float16, np.float32,
-                              np.float64)):
-            return float(obj)
-        elif isinstance(obj, (np.ndarray,)):
-            return obj.tolist()
-        elif isinstance(obj, datetime):
-            return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
 
 
 def estudiantes_que_terminaron_antes(hora: datetime, df_estudiantes: pd.DataFrame) -> bool:
@@ -134,8 +114,6 @@ def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_
 def run_pycollaborator(answers_df, marks_df) -> Tuple[Dict[str, List[Dict]], pd.DataFrame]:
     py_cheat_df = marks_df[["Nombre", "Código", "Tiempo", "Inicio", "Fin", "Segundos", "Nota"]]
     py_cheat_df["Productividad"] = (py_cheat_df["Nota"] / (py_cheat_df["Segundos"] / 60))
-    # py_cheat_df.to_excel('files/tool_output/06_py_collaborator_outputs/py_cheat_df.xlsx', index=False)
-
     columnas = ["Código", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10"]
 
     py_collaborator = []

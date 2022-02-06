@@ -1,8 +1,8 @@
-import numpy as np  # linear algebra
-import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+from typing import Tuple, Dict, List
+
+import numpy as np
+import pandas as pd
 import json
-from datetime import datetime
-from scripts.script6.py_collaborator_outputs import NumpyEncoder
 
 
 def merge_dataframes(py_collaboartor_df: pd.DataFrame, respuestas_df: pd.DataFrame, preguntas_df: pd.DataFrame,
@@ -54,7 +54,6 @@ def merge_dataframes(py_collaboartor_df: pd.DataFrame, respuestas_df: pd.DataFra
                 merge_df['Q' + str(x) + '_q'][i] = 'Desconocida'
                 merge_df['Q' + str(x) + '_m'][i] = np.float64(0)
     merge_df = merge_df.set_index('Nombre')
-    merge_df.to_excel('files/tool_output/07_acumulated_knowladge/merge_df.xlsx')
     return merge_df
 
 
@@ -196,7 +195,8 @@ def ratio_preg(i, preguntas_df, merge_df, verbose=True) -> {}:
     return questions
 
 
-def run_script07(answers_df_cleaned, df_xml_cleaned, answer_times_merged_df, py_cheat_df):
+def run_script07(answers_df_cleaned, df_xml_cleaned, answer_times_merged_df, py_cheat_df) -> \
+        Tuple[pd.DataFrame, Dict, Dict, List]:
     merge_df = merge_dataframes(py_cheat_df, answers_df_cleaned, df_xml_cleaned, answer_times_merged_df)
 
     salida_preg = []
@@ -205,30 +205,21 @@ def run_script07(answers_df_cleaned, df_xml_cleaned, answer_times_merged_df, py_
 
     ratio_preguntas = {"questions": salida_preg}
 
-    with open('files/tool_output/07_acumulated_knowladge/outputRatioPreg.json', 'w', encoding='utf8') as outfile:
-        json.dump(ratio_preguntas, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
-
     salida = []
     for i in range(len(merge_df)):
         salida.append(CA(i, merge_df))
 
     conocimiento_acumulado = {"students": salida}
 
-    with open('files/tool_output/07_acumulated_knowladge/outputCA.json', 'w', encoding='utf8') as outfile:
-        json.dump(conocimiento_acumulado, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
-
     result = merge_df.to_json(index='Nombre', orient="index", date_format='iso', date_unit='s')
     merge_df_json = json.loads(result)
-
-    with open('files/tool_output/07_acumulated_knowladge/merge_df.json', 'w', encoding='utf8') as outfile:
-        json.dump(merge_df_json, outfile, indent=2, cls=NumpyEncoder, ensure_ascii=False)
 
     merge_df = merge_df_columns_to_datetime64(merge_df)
 
     return merge_df, ratio_preguntas, conocimiento_acumulado, merge_df_json
 
 
-def merge_df_columns_to_datetime64(merge_df):
+def merge_df_columns_to_datetime64(merge_df) -> pd.DataFrame:
     """
     Función que cambia las columnas con formato object a datetime64 para mayor precisión
     Args:

@@ -1,8 +1,5 @@
-import codecs
-import json
 from operator import itemgetter
-
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 
 def anonymize_log(json_logs: List, name_user_dictionary: dict) -> List:
@@ -49,7 +46,7 @@ def anonymize_others(json_answers_or_marks: List, name_user_dictionary: dict) ->
     return json_answers_or_marks
 
 
-def anonymizer() -> Tuple[List, List, List, List]:
+def anonymizer(json_exam_marks, json_logs, json_exam_answers) -> Tuple[List, List, List, List, Dict]:
     """
         Ejecuta el script para anonimizar los JSON a través de la plataforma web
             exam_answers_utf8.json
@@ -59,15 +56,6 @@ def anonymizer() -> Tuple[List, List, List, List]:
         Returns:
             Tuple[List, List, List, List]: json_logs, json_exam_answers, json_exam_marks, promedio_general
     """
-
-    with open('files/tool_input/exam_answers_utf8.json', encoding='utf-8') as json_file:
-        json_exam_answers = json.load(json_file)
-
-    with open('files/tool_input/exam_califications_utf8.json', encoding='utf-8') as json_file:
-        json_exam_marks = json.load(json_file)
-
-    with open('files/tool_input/exam_logs_utf8.json', encoding='utf-8') as json_file:
-        json_logs = json.load(json_file)
 
     # this is because our json is a list of "list of lists" (three levels)
     json_exam_answers = json_exam_answers[0]
@@ -83,8 +71,6 @@ def anonymizer() -> Tuple[List, List, List, List]:
     user_number_list = list(map(lambda number: 'user' + str(number), number_list))
 
     name_user_dictionary = dict(zip(list_unique_names, user_number_list))
-    with codecs.open('files/tool_output/01_anonymized_input/name_user_dictionary.json', 'w', encoding='utf-8') as f:
-        json.dump(name_user_dictionary, f, ensure_ascii=False, indent=2)
 
     # anonymize json files
     json_logs = anonymize_log(json_logs, name_user_dictionary)
@@ -99,19 +85,7 @@ def anonymizer() -> Tuple[List, List, List, List]:
     promedio_general = get_promedio_general(json_exam_marks)
     json_exam_marks.pop(0)  # lo elimina también de json_exam_marks
 
-    with codecs.open('files/tool_output/01_anonymized_input/exam_answers_utf8_anonymized.json', 'w',
-                     encoding='utf-8') as f:
-        json.dump(json_exam_answers, f, ensure_ascii=False, indent=2)
-
-    with codecs.open('files/tool_output/01_anonymized_input/exam_califications_utf8_anonymized.json', 'w',
-                     encoding='utf-8') as f:
-        json.dump(json_exam_marks, f, ensure_ascii=False, indent=2)
-
-    with codecs.open('files/tool_output/01_anonymized_input/exam_logs_utf8_anonymized.json', 'w',
-                     encoding='utf-8') as f:
-        json.dump(json_logs, f, ensure_ascii=False, indent=2)
-
-    return json_logs, json_exam_answers, json_exam_marks, promedio_general
+    return json_logs, json_exam_answers, json_exam_marks, promedio_general, name_user_dictionary
 
 
 def get_promedio_general(json_exam_marks: List) -> List:

@@ -1,5 +1,4 @@
 import pandas as pd
-import json
 
 
 def get_answer_times_df(marks_df, log_json) -> pd.DataFrame:
@@ -12,11 +11,6 @@ def get_answer_times_df(marks_df, log_json) -> pd.DataFrame:
     Returns: df_answer_times: Dataframe que contiene las horas de respuesta para cada pregunta por cada estudiante.
 
     """
-    # marks_df = pd.read_excel('files/tool_output/03_anwers_and_califications_dataframe/marks.xlsx')
-
-    # leemos el log durante el examen
-    # with open('files/tool_output/01_anonymized_input/exam_logs_utf8_anonymized.json', encoding='utf-8') as json_file:
-    #    log_json = json.load(json_file)
 
     json_df = pd.DataFrame(log_json)
     json_df.columns = ['Hora', 'Nombre', 'Nombre_aux', 'Tipo', 'Clase', 'Resumen', 'Descripción', 'Web', 'IP']
@@ -71,10 +65,6 @@ def get_answer_times_df(marks_df, log_json) -> pd.DataFrame:
 
         df_answer_times = pd.concat([df_answer_times, json_T])
 
-        json_T.to_excel(
-            'files/tool_output/04_answers_time/individual_answer_times/'
-            + str(name) + '_' + str(mark) + "#" + str(n_rows) + '.xlsx', index=False)
-
     df_answer_times.reset_index(drop=True, inplace=True)
 
     df_answer_times[['Inicio', 'Q1_t', 'Q2_t', 'Q3_t', 'Q4_t', 'Q5_t', 'Q6_t', 'Q7_t', 'Q8_t', 'Q9_t', 'Q10_t']] = \
@@ -82,5 +72,4 @@ def get_answer_times_df(marks_df, log_json) -> pd.DataFrame:
             ['Inicio', 'Q1_t', 'Q2_t', 'Q3_t', 'Q4_t', 'Q5_t', 'Q6_t', 'Q7_t', 'Q8_t', 'Q9_t', 'Q10_t']].apply(
             pd.to_datetime)
 
-    df_answer_times.to_excel('files/tool_output/04_answers_time/answer_times_merged.xlsx')
     return df_answer_times

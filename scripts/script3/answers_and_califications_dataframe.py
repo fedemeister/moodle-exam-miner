@@ -2,9 +2,7 @@ from typing import Tuple
 
 import numpy as np  # linear algebra
 import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
-import json
 from datetime import datetime
-import csv
 
 
 def convert(o) -> int:  # hay que convertir los np.int64 a enteros porque np.int64 is not JSON serializable
@@ -24,7 +22,6 @@ def cambiar_formato_fecha(fecha: str) -> str:
         fecha(str):Cadena de entrada donde han sido eliminado lo innecesario para ser procesado correctamente
         Ejemplo de salida --> 22 05 2020 11:23
     """
-    # print(fecha)
     fecha = fecha.replace("de", "")
     fecha = fecha.replace("enero", "01")
     fecha = fecha.replace("febrero", "02")
@@ -38,10 +35,7 @@ def cambiar_formato_fecha(fecha: str) -> str:
     fecha = fecha.replace("octubre", "10")
     fecha = fecha.replace("noviembre", "11")
     fecha = fecha.replace("diciembre", "12")
-
     fecha = fecha.replace("  ", " ")
-
-    # print(fecha)
 
     return fecha
 
@@ -112,35 +106,20 @@ def formateo_json(my_json: list, devolver: bool = False) -> list:
         return my_json
 
 
-def guardar_json_formateado_csv(data: list):
-    for i in range(len(data)):
-        with open('calificaciones1.csv', 'a', encoding='utf-8-sig') as csv_file:
-            csv_writer = csv.writer(csv_file, delimiter=',')
-            csv_writer.writerow(data[i])
-
-
-def json_to_dataframe_and_excel(my_json: list, my_columns: list, name: str) -> pd.DataFrame:
+def json_to_dataframe(my_json: list, my_columns: list) -> pd.DataFrame:
     df = pd.DataFrame(my_json)
     df.columns = my_columns
     df.sort_values(by=['Inicio', 'Fin'], inplace=True, ascending=True, ignore_index=True)
-    df.to_excel('files/tool_output/03_anwers_and_califications_dataframe/' + str(name) + '.xlsx', index=False)
     return df
 
 
-def create_marks_and_answers_df() -> Tuple[pd.DataFrame, pd.DataFrame]:
+def create_marks_and_answers_df(json_exam_marks, json_exam_answers) -> Tuple[pd.DataFrame, pd.DataFrame]:
     columnas = ['Apellidos', 'Nombre', 'Código', 'Email', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota',
                 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10']
 
-    with open('files/tool_output/01_anonymized_input/exam_answers_utf8_anonymized.json', encoding='utf-8') as json_file:
-        respuestas_json = json.load(json_file)
+    json_exam_marks = formateo_json(json_exam_marks, devolver=True)
+    json_exam_answers = formateo_json(json_exam_answers, devolver=True)
 
-    with open('files/tool_output/01_anonymized_input/exam_califications_utf8_anonymized.json',
-              encoding='utf-8') as json_file:
-        calificaciones_json = json.load(json_file)
-
-    calificaciones_json = formateo_json(calificaciones_json, devolver=True)
-    respuestas_json = formateo_json(respuestas_json, devolver=True)
-
-    marks_df = json_to_dataframe_and_excel(calificaciones_json, columnas, 'marks')
-    answers_df = json_to_dataframe_and_excel(respuestas_json, columnas, 'answers')
+    marks_df = json_to_dataframe(json_exam_marks, columnas)
+    answers_df = json_to_dataframe(json_exam_answers, columnas)
     return marks_df, answers_df
