@@ -10,6 +10,8 @@ from tests.fixtures_global.fixtures_global import fixture_xml_dataframe_with_ans
 from tests.fixtures_global.fixtures_global import fixture_json_answers_formatted_df
 from scripts.script5.answers_and_questions_cleaned import run_script05
 from scripts.script2.questions import run_script02
+from tests.fixtures_global.fixtures_global_anonimizados import fixture_json_marks_anonymized
+from tests.fixtures_global.fixtures_global_anonimizados import fixture_json_answers_anonymized
 
 
 @pytest.fixture(scope='module')
@@ -330,7 +332,11 @@ def df_transformed():
                          'T1 - simple - NULL 5',
                          'T1 - simple - NULL 5',
                          'T1 - simple - NULL 5',
-                         'T1 - simple - NULL 5'],
+                         'T1 - simple - NULL 5',
+                         'Desconocida',
+                         'Desconocida',
+                         'Desconocida',
+                         'Desconocida'],
             'Answer': ["<p>SELECT * FROM socios WHERE nombre LIKE 'J%' AND nombre NOT LIKE '%m%';</p>",
                        "<p>SELECT * FROM socios WHERE nombre IN 'J*' AND nombre NOT IN '*m*';</p>",
                        "<p>SELECT * FROM socios WHERE nombre = 'J*' AND nombre != '*m*';</p>",
@@ -370,7 +376,11 @@ def df_transformed():
                        '<p>SELECT * FROM socios WHERE telefono IS NULL AND apellido2 IS NOT NULL;</p>',
                        '<p>SELECT * FROM socios WHERE telefono = NULL and apellido2 != NULL;</p>',
                        '<p>SELECT * FROM socios WHERE telefono = "NULL" and apellido2 != "NULL";</p>',
-                       '<p>SELECT * FROM socios WHERE telefono LIKE "NULL" AND apellido2 NOT LIKE "NULL";</p>'],
+                       '<p>SELECT * FROM socios WHERE telefono LIKE "NULL" AND apellido2 NOT LIKE "NULL";</p>',
+                       '-',
+                       '-',
+                       '-',
+                       '-'],
             'Mark': [1.0,
                      -0.25,
                      -0.25,
@@ -410,7 +420,11 @@ def df_transformed():
                      1.0,
                      -0.25,
                      -0.25,
-                     -0.25]
+                     -0.25,
+                     0,
+                     0,
+                     0,
+                     0]
         }
     )
 
@@ -449,9 +463,10 @@ def test_answers_in_answers_df_are_in_the_xml(fixture_raw_xml_dataframe,
     pd.testing.assert_frame_equal(actual, expected)
 
 
-def test_data_in_answers_df_are_also_in_the_xml_using_dfcheck_variable_and_outputs_from_previous_scripts():
+def test_data_in_answers_df_are_also_in_the_xml_using_dfcheck_variable_and_outputs_from_previous_scripts(
+        fixture_json_marks_anonymized, fixture_json_answers_anonymized):
     df_xml_output = run_script02()
-    marks_df, answers_df = create_marks_and_answers_df()
+    marks_df, answers_df = create_marks_and_answers_df(fixture_json_marks_anonymized, fixture_json_answers_anonymized)
     df_todas_preguntas, df_check, nothing = run_script05(answers_df, df_xml_output)
 
     actual = df_check[df_check == 0].shape[0]
