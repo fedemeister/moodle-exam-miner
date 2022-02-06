@@ -41,8 +41,6 @@ def execution(df_raw_xml: pd.DataFrame) -> pd.DataFrame:
 
     df_xml_output = pd.DataFrame(raw_data)
     df_xml_output["Mark"].replace({"100": float(1), "-25": float(-0.25)}, inplace=True)
-
-    df_xml_output.to_excel('files/tool_output/02_questions_and_answers_set/raw_quest_answ_output.xlsx', index=False)
     return df_xml_output
 
 
@@ -68,6 +66,12 @@ def extract_xml_information(df_multichoice_new: pd.DataFrame, rows: int) -> Tupl
         for j in range(0, 4):
             raw_answers.append(df_multichoice_new.answer.iloc[i][j]['text'])
             raw_marks.append(df_multichoice_new.answer.iloc[i][j]['@fraction'])
+
+    # añadimos cuando se deja la pregunta en blanco
+    [raw_answers.append('-') for _ in range(4)]
+    [raw_questions.append('Desconocida') for _ in range(4)]
+    [raw_marks.append(0) for _ in range(4)]
+
     return raw_answers, raw_questions, raw_marks
 
 
