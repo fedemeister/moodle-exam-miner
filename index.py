@@ -4,12 +4,10 @@ from io import BytesIO
 import zipfile
 import os
 from flask import send_file
-from web.dash_app import create_dash_application
 import plotly.express as px
 from dash import dcc, html, Input, Output
 
 app = Flask(__name__, template_folder='web/mem_flask/templates')
-dash_app = create_dash_application(app)
 
 
 @app.route('/zipped_data')
@@ -89,6 +87,9 @@ def scripts_run():
     questions_chart_df = questions_chart.questions_chart(merge_df)
     all_questions = questions_chart_df['Número'].unique()
     all_clusters = df_clusters_total.Cluster.unique()
+    from web.dash_app import create_dash_application
+
+    dash_app = create_dash_application(app)
 
     @dash_app.callback(
         Output("fig_clusters", "figure"),
