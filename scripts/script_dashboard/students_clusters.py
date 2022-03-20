@@ -2,8 +2,8 @@ import pandas as pd
 from datetime import timedelta
 
 
-def creacion_padre_hijo():
-    py_cheat = pd.read_excel("files/tool_output/06_py_collaborator_outputs/py_cheat_df.xlsx")
+def funcion_clusters(py_cheat_df, merge_df):
+    py_cheat = py_cheat_df.copy()
     lista_i = []
     lista_j = []
     for i in range(0, len(py_cheat)):
@@ -16,16 +16,12 @@ def creacion_padre_hijo():
                     )
                     & (py_cheat.iloc[i]['Nota'] <= py_cheat.iloc[j]['Nota'])
             ):
-                lista_i.append(py_cheat.iloc[i]['Nombre'])
-                lista_j.append(py_cheat.iloc[j]['Nombre'])
+                lista_i.append(py_cheat.iloc[i]['Código'])
+                lista_j.append(py_cheat.iloc[j]['Código'])
 
     data_tuples = list(zip(lista_i, lista_j))
     salida = pd.DataFrame(data_tuples, columns=['i', 'j'])
 
-    creacion_lista_clusters(salida)
-
-
-def creacion_lista_clusters(salida):
     lista_de_cluster = []
     lista_de_usuarios = salida.i.to_list()
     lista_de_usuarios = list(dict.fromkeys(lista_de_usuarios))  # nos quedamos con los usuarios sin duplicados
@@ -61,7 +57,7 @@ def creacion_lista_clusters(salida):
                         if usuario == lista_de_cluster[cluster2][-1] and longitud_minitabla == 1:
                             lista_de_cluster[cluster2].append(jotas[-1])
                 else:
-                    operacion = count / longitud_minitabla  # hacemos jota tantas veces como sea necesario para alvergar
+                    operacion = count / longitud_minitabla  # hacemos jota tantas veces como sea necesario para alojar
                     operacion = int(operacion)
                     jotas = jotas * operacion
                     jotas.sort()
@@ -74,10 +70,6 @@ def creacion_lista_clusters(salida):
                 for x in range(0, len(aux)):
                     lista_de_cluster.append(aux[x])
 
-    crear_listas_clusters(lista_de_cluster)
-
-
-def crear_listas_clusters(lista_de_cluster):
     lista_usuarios_sin_repetir = []
     lista_de_cluster_2 = []
     for row in lista_de_cluster:
@@ -87,14 +79,10 @@ def crear_listas_clusters(lista_de_cluster):
                     lista_usuarios_sin_repetir.append(user)
             lista_de_cluster_2.append(row)
 
-    creacion_grafico(lista_usuarios_sin_repetir, lista_de_cluster_2)
-
-
-def creacion_grafico(lista_usuarios_sin_repetir, lista_de_cluster_2):
-    df_merged = pd.read_excel("files/tool_output/07_acumulated_knowladge/merge_df.xlsx")
+    df_merged = merge_df.copy()
     df_merged2 = pd.DataFrame(columns=df_merged.columns)
     for user in lista_usuarios_sin_repetir:
-        df_aux = df_merged[df_merged['Nombre'] == user]
+        df_aux = df_merged[df_merged['Código'] == user]
         df_merged2 = df_merged2.append(df_aux)
 
     df_merged2.reset_index(drop=True, inplace=True)
@@ -121,7 +109,7 @@ def creacion_grafico(lista_usuarios_sin_repetir, lista_de_cluster_2):
     df_final = pd.DataFrame()
     for x in range(0, 11):
         melt = pd.melt(df_merged2,
-                       id_vars=['Nombre', 'Tiempo', 'Productividad', 'Q' + str(x) + '_t', 'Q' + str(x) + '_q',
+                       id_vars=['Código', 'Tiempo', 'Productividad', 'Q' + str(x) + '_t', 'Q' + str(x) + '_q',
                                 'Q' + str(x) + '_a'],
                        value_vars=['Pregunta ' + str(x)],
                        value_name='Nota')
@@ -136,18 +124,14 @@ def creacion_grafico(lista_usuarios_sin_repetir, lista_de_cluster_2):
 
     df_final["variable"].replace({"Pregunta 0": "Inicio"}, inplace=True)
 
-    creacion_df_definitivo(df_final, lista_de_cluster_2)
-
-
-def creacion_df_definitivo(df_final, lista_de_cluster_2):
     df_definitivo = pd.DataFrame(columns=df_final.columns)
     id_cluster = 1
 
     for cluster in lista_de_cluster_2:
         for user in cluster:
-            df_aux = df_final[df_final['Nombre'] == user]
+            df_aux = df_final[df_final['Código'] == user]
             df_aux['Cluster'] = 'Cluster ' + str(id_cluster)
             df_definitivo = df_definitivo.append(df_aux)
         id_cluster = id_cluster + 1
 
-    df_definitivo.to_excel('files/tool_output/clustering/df_clusters_total.xlsx', index=False)
+    return df_definitivo

@@ -2,11 +2,11 @@ import pandas_read_xml as pdx
 import pandas as pd
 from typing import Tuple
 
-df = pdx.read_xml('files/tool_input/exam_questions_set.xml',
-                  ['quiz', 'question'],
-                  root_is_rows=False,
-                  transpose=False,
-                  encoding='UTF8')
+# df = pdx.read_xml('files/tool_input/exam_questions_set.xml',
+#                   ['quiz', 'question'],
+#                   root_is_rows=False,
+#                   transpose=False,
+#                   encoding='UTF8')
 
 
 def get_just_multichoice_dataframe(df_raw_xml: pd.DataFrame) -> pd.DataFrame:
@@ -76,5 +76,10 @@ def extract_xml_information(df_multichoice_new: pd.DataFrame, rows: int) -> Tupl
 
 
 def run_script02() -> pd.DataFrame:
+    df = pdx.read_xml('files/tool_input/exam_questions_set.xml',
+                      ['quiz', 'question'],
+                      root_is_rows=False,
+                      transpose=False,
+                      encoding='UTF8')
     df_xml_output = execution(df_raw_xml=df)
     return df_xml_output
