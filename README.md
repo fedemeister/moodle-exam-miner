@@ -1,6 +1,5 @@
-# moodle-exam-miner [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
+# moodle-exam-miner [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)![Tests](https://github.com/fedemeister/moodle-exam-miner/actions/workflows/tests.yml/badge.svg)
 This is a beta version of the project.  It is currently in development with regular updates. Once it is completed we will let you know and release the official version!
-
 
 The technology used is **pandas** to deal with data and **plotly** to make interactive graphs of the results.
 
