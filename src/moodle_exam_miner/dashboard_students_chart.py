@@ -37,7 +37,8 @@ def fig_estudiantes(merge_df):
                                     })
 
         df_final = df_final.append(melt)
-
+    title_fig_estudiantes = "Representación gráfica de cómo ha ido la nota del alumno durante el examen. " \
+                            "Para enfocarse en un solo alumno, dar doble click al alumno en la leyenda de la derecha."
     fig_estudiantes = px.line(df_final,
                               x="Hora",
                               y="Nota",
@@ -48,7 +49,7 @@ def fig_estudiantes(merge_df):
                                           'Productividad al final del examen'],
                               render_mode='svg',
                               # line_shape="spline",
-                              title="Representación gráfica de cómo ha ido la nota del alumno durante el examen. Para enfocarse en un solo alumno, dar doble click al alumno en la leyenda de la derecha.")
+                              title=title_fig_estudiantes)
 
     fig_estudiantes.update_layout(
         xaxis=dict(

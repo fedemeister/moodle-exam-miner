@@ -17,15 +17,13 @@ def get_answer_times_df(marks_df, log_json) -> pd.DataFrame:
     json_df['Hora'] = pd.to_datetime(json_df['Hora'])  # creamos el dataframe y asignamos la hora en formato datetime
 
     # preparamos el dataframe que vamos a devolver
-    df_answer_times = pd.DataFrame(columns=
-                                   ['Nombre', 'Inicio', 'Q1_t', 'Q2_t', 'Q3_t', 'Q4_t',
-                                    'Q5_t', 'Q6_t', 'Q7_t', 'Q8_t', 'Q9_t', 'Q10_t'])
+    df_answer_times = pd.DataFrame(
+        columns=['Nombre', 'Inicio', 'Q1_t', 'Q2_t', 'Q3_t', 'Q4_t', 'Q5_t', 'Q6_t', 'Q7_t', 'Q8_t', 'Q9_t', 'Q10_t'])
 
     for i in range(0, marks_df.shape[0]):
         name = marks_df.iloc[i].Nombre
         start = marks_df.iloc[i].Inicio
         end = marks_df.iloc[i].Fin
-        mark = marks_df.iloc[i].Nota
 
         json_particular_df = json_df[(json_df['Hora'] >= start)
                                      & (json_df['Hora'] <= end)
@@ -34,10 +32,6 @@ def get_answer_times_df(marks_df, log_json) -> pd.DataFrame:
                                      & ((json_df['Resumen'] == "Intento de cuestionario visualizado")
                                         | (json_df['Resumen'] == "Intento enviado"))
                                      ]
-        # guardamos cuántas filas tenía antes de hacer el preprocesado.
-        # Esto sirve para saber cuáles tenían > 10 visualizaciones de respuestas
-        n_rows = (json_particular_df.shape[0] - 1)
-
         json_particular_df.reset_index(drop=True, inplace=True)
 
         # eliminamos la primera fila,

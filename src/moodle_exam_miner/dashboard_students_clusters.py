@@ -10,11 +10,10 @@ def funcion_clusters(py_cheat_df, merge_df):
         for j in range(0, len(py_cheat)):
             if (
                     (
-                            (py_cheat.iloc[i]['Fin'] == (py_cheat.iloc[j]['Inicio'] + timedelta(minutes=1))) |
-                            (py_cheat.iloc[i]['Fin'] == (py_cheat.iloc[j]['Inicio'] - timedelta(minutes=1))) |
-                            (py_cheat.iloc[i]['Fin'] == (py_cheat.iloc[j]['Inicio']))
-                    )
-                    & (py_cheat.iloc[i]['Nota'] <= py_cheat.iloc[j]['Nota'])
+                        (py_cheat.iloc[i]['Fin'] == (py_cheat.iloc[j]['Inicio'] + timedelta(minutes=1))) |
+                        (py_cheat.iloc[i]['Fin'] == (py_cheat.iloc[j]['Inicio'] - timedelta(minutes=1))) |
+                        (py_cheat.iloc[i]['Fin'] == py_cheat.iloc[j]['Inicio'])
+                    ) & (py_cheat.iloc[i]['Nota'] <= py_cheat.iloc[j]['Nota'])
             ):
                 lista_i.append(py_cheat.iloc[i]['Código'])
                 lista_j.append(py_cheat.iloc[j]['Código'])
