@@ -4,12 +4,12 @@ import pytest
 import pandas as pd
 from numpy import nan
 
-from scripts.script3.answers_and_califications_dataframe import create_marks_and_answers_df
+from moodle_exam_miner.script3_answers_and_califications_dataframe import create_marks_and_answers_df
 from tests.fixtures_global.fixtures_global import fixture_raw_xml_dataframe
 from tests.fixtures_global.fixtures_global import fixture_xml_dataframe_with_answers_from_answers_df
 from tests.fixtures_global.fixtures_global import fixture_json_answers_formatted_df
-from scripts.script5.answers_and_questions_cleaned import run_script05
-from scripts.script2.questions import run_script02
+from moodle_exam_miner.script5_answers_and_questions_cleaned import run_script05
+from moodle_exam_miner.script2_questions import run_script02
 from tests.fixtures_global.fixtures_global_anonimizados import fixture_json_marks_anonymized
 from tests.fixtures_global.fixtures_global_anonimizados import fixture_json_answers_anonymized
 

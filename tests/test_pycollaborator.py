@@ -5,7 +5,7 @@ from tests.fixtures_global.fixtures_global_anonimizados import fixture_answers_d
 from tests.fixtures_global.fixtures_global_anonimizados import fixture_json_marks_formatted_anonymized
 from tests.fixtures_global.fixtures_global_anonimizados import fixture_py_cheat_df_anonymized
 
-from scripts.script6.py_collaborator_outputs import run_pycollaborator
+from moodle_exam_miner.script6_py_collaborator_outputs import run_pycollaborator
 
 
 def test_py_collaborator(fixture_py_collaborator_anonymized,

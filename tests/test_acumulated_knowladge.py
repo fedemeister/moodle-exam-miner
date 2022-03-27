@@ -9,7 +9,7 @@ from tests.fixtures_global.fixtures_global_anonimizados import fixture_merge_df_
 from tests.fixtures_global.fixtures_global import fixture_xml_dataframe_with_answers_from_answers_df
 from tests.fixtures_global.fixtures_global import fixture_ratio_pregunta
 
-from scripts.script7.acumulated_knowladge import run_script07
+from moodle_exam_miner.script7_acumulated_knowladge import run_script07
 
 
 def test_merge_df(fixture_merge_df_anonymized,

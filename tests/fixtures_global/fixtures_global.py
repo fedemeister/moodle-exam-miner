@@ -1,8 +1,7 @@
-import json
+from datetime import datetime
 
 import pandas as pd
 import pytest
-from datetime import datetime
 
 
 @pytest.fixture(scope='session')
