@@ -19,20 +19,20 @@ def merge_dataframes(py_collaboartor_df: pd.DataFrame, respuestas_df: pd.DataFra
         Un dataframe "merge_df" que tiene todos la información unida.
     """
     merge_df = pd.DataFrame(data=py_collaboartor_df[['Nombre', 'Código', 'Tiempo',
-                                                     'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']]
-                            , columns=['Nombre', 'Código', 'Tiempo',
-                                       'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad',
-                                       'Q0_t', 'Q0_q', 'Q0_a', 'Q0_m',
-                                       'Q1_t', 'Q1_q', 'Q1_a', 'Q1_m',
-                                       'Q2_t', 'Q2_q', 'Q2_a', 'Q2_m',
-                                       'Q3_t', 'Q3_q', 'Q3_a', 'Q3_m',
-                                       'Q4_t', 'Q4_q', 'Q4_a', 'Q4_m',
-                                       'Q5_t', 'Q5_q', 'Q5_a', 'Q5_m',
-                                       'Q6_t', 'Q6_q', 'Q6_a', 'Q6_m',
-                                       'Q7_t', 'Q7_q', 'Q7_a', 'Q7_m',
-                                       'Q8_t', 'Q8_q', 'Q8_a', 'Q8_m',
-                                       'Q9_t', 'Q9_q', 'Q9_a', 'Q9_m',
-                                       'Q10_t', 'Q10_q', 'Q10_a', 'Q10_m'])
+                                                     'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']],
+                            columns=['Nombre', 'Código', 'Tiempo',
+                                     'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad',
+                                     'Q0_t', 'Q0_q', 'Q0_a', 'Q0_m',
+                                     'Q1_t', 'Q1_q', 'Q1_a', 'Q1_m',
+                                     'Q2_t', 'Q2_q', 'Q2_a', 'Q2_m',
+                                     'Q3_t', 'Q3_q', 'Q3_a', 'Q3_m',
+                                     'Q4_t', 'Q4_q', 'Q4_a', 'Q4_m',
+                                     'Q5_t', 'Q5_q', 'Q5_a', 'Q5_m',
+                                     'Q6_t', 'Q6_q', 'Q6_a', 'Q6_m',
+                                     'Q7_t', 'Q7_q', 'Q7_a', 'Q7_m',
+                                     'Q8_t', 'Q8_q', 'Q8_a', 'Q8_m',
+                                     'Q9_t', 'Q9_q', 'Q9_a', 'Q9_m',
+                                     'Q10_t', 'Q10_q', 'Q10_a', 'Q10_m'])
 
     for i in range(0, merge_df.shape[0]):
         merge_df['Q0_t'][i] = respuestas_df['Inicio'][i]
@@ -74,13 +74,12 @@ def misma_pregunta_luego(x, pregunta: str, respuesta: str, hora_respuesta, merge
         o puede devolver 0, False si no encuentra ese estudiante.
     """
     if len(merge_df['Código'][
-               (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)]) > 0:
+            (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)]) > 0:
         cod1 = merge_df['Código'][
-            (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)].iloc[
-            0]  # el siguiente
+            (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)].iloc[0]
         if len(merge_df['Código'][
-                   (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
-                   (merge_df['Q' + str(x) + '_a'] == respuesta)]) > 0:
+                (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
+                (merge_df['Q' + str(x) + '_a'] == respuesta)]) > 0:
             cod2 = merge_df['Código'][
                 (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
                 (merge_df['Q' + str(x) + '_a'] == respuesta)].iloc[0]  # el siguiente
