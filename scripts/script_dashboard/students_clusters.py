@@ -127,11 +127,17 @@ def funcion_clusters(py_cheat_df, merge_df):
     df_definitivo = pd.DataFrame(columns=df_final.columns)
     id_cluster = 1
 
-    for cluster in lista_de_cluster_2:
-        for user in cluster:
-            df_aux = df_final[df_final['Código'] == user]
-            df_aux['Cluster'] = 'Cluster ' + str(id_cluster)
-            df_definitivo = df_definitivo.append(df_aux)
-        id_cluster = id_cluster + 1
+    if len(lista_de_cluster_2) > 0:
+        for cluster in lista_de_cluster_2:
+            for user in cluster:
+                df_aux = df_final[df_final['Código'] == user]
+                df_aux['Cluster'] = 'Cluster ' + str(id_cluster)
+                df_definitivo = df_definitivo.append(df_aux)
+            id_cluster = id_cluster + 1
+    else:
+        df_aux = df_final[df_final['Código'] == py_cheat.iloc[0]['Código']]
+        df_aux['Cluster'] = 'Cluster ' + str(id_cluster)
+        df_definitivo = df_definitivo.append(df_aux)
+        print("no cluster")
 
     return df_definitivo

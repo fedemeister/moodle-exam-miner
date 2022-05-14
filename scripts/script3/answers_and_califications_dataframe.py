@@ -4,6 +4,7 @@ import numpy as np  # linear algebra
 import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
 from datetime import datetime
 
+pd.options.mode.chained_assignment = None  # default='warn'
 
 def convert(o) -> int:  # hay que convertir los np.int64 a enteros porque np.int64 is not JSON serializable
     if isinstance(o, np.int64):
