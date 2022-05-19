@@ -7,11 +7,7 @@ from flask import send_file
 import plotly.express as px
 from dash import dcc, html, Input, Output
 
-app = Flask(__name__, template_folder='web/mem_flask/templates')
-
-import warnings
-
-warnings.simplefilter(action='ignore', category=FutureWarning)
+app = Flask(__name__, template_folder='web/mem_flask/templates', static_folder='web/mem_flask/static')
 
 
 @app.route('/zipped_data')
@@ -47,7 +43,6 @@ from scripts.script_dashboard import questions_chart
 
 @app.route('/scripts_run')
 def scripts_run():
-    tic = time.perf_counter()
     # SCRIPT 0
     json_marks_utf8, json_logs_utf8, json_answers_utf8 = jsons_to_utf8()
 
@@ -117,8 +112,8 @@ def scripts_run():
                                            },
                                render_mode='svg',
                                line_shape="spline",
-                               symbol="Cluster")
-        # title="Representación gráfica de cómo ha ido la nota del estudiante durante el examen. Para enfocarse en un solo estudiante, dar doble click al estudiante en la leyenda de la derecha.")
+                               symbol="Cluster",
+                               title="Representación gráfica de cómo ha ido la nota del estudiante durante el examen. Para enfocarse en un solo estudiante, dar doble click al estudiante en la leyenda de la derecha.")
         # fig_clusters.update_layout(hovermode="x unified")
         fig_clusters.update_layout(
             xaxis=dict(
@@ -238,9 +233,6 @@ def scripts_run():
             dcc.Graph(id="fig_questions")
         ])
     ])
-    toc = time.perf_counter()
-
-    print(f"run_scripts {toc - tic:0.4f} seconds")
 
     return redirect('dash')
 
@@ -248,22 +240,22 @@ def scripts_run():
 @app.route('/')
 @app.route('/home')
 def homepage():
-    return render_template('base.html', title='Home Page')
+    return render_template('base.html', title='Inicio')
 
 
 @app.route('/about')
 def about():
-    return render_template('about.html', title='About')
+    return render_template('about.html', title='Acerca de MEM')
 
 
 @app.route('/features')
 def features():
-    return render_template('features.html', title='Features')
+    return render_template('features.html', title='Características')
 
 
 @app.route('/faqs')
 def faqs():
-    return render_template('faqs.html', title='FAQs')
+    return render_template('faqs.html', title='Preguntas frecuentes (FAQs)')
 
 
 app.config["UPLOAD_FOLDER"] = "files/tool_input"
