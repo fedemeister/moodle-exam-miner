@@ -1,23 +1,42 @@
 {% extends 'layout.html' %}
 {% block content %}
+      <div class="container">
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+        <span class="fs-4">Moodle Exam Miner</span>
+      </a>
+
+      <ul class="nav nav-pills">
+        <li class="nav-item"><a href="{{url_for('homepage')}}" class="nav-link active" aria-current="page">Inicio</a></li>
+        <li class="nav-item"><a href="{{url_for('features')}}" class="nav-link">Características</a></li>
+        <!--<li class="nav-item"><a href="#" class="nav-link disabled">Pricing</a></li> -->
+        <li class="nav-item"><a href="{{url_for('faqs')}}" class="nav-link">Preguntas Frecuentes</a></li>
+        <li class="nav-item"><a href="{{url_for('about')}}" class="nav-link">Acerca de MEM</a></li>
+      </ul>
+    </header>
+  </div>
 <div class="container">
   <div class="row">
     <div class="col">
 
-      <h1>Upload your exam files</h1>
+      <h1>Bienvenido, suba los ficheros del examen</h1>
       <hr>
 
       <form action="/scripts" method="POST" enctype="multipart/form-data">
 
         <div class="form-group">
-          <label>Select files</label>
+
+
+          <label>Para que la herramienta funcione correctamente hay que usar 4 archivos con un nombre específico. Para más información entrar en <a href="{{url_for('faqs')}}" aria-current="page">Preguntas frecuentes</a></label>
+            <br><br>
           <div class="custom-file">
             <input oninput="filesize(this);" class="form-control" type="file" name="formFileMultiple" id="formFileMultiple" multiple />
-            <label class="custom-file-label" for="formFileMultiple">Select jsons...</label>
+            <!--<label class="custom-file-label" for="formFileMultiple">Select jsons...</label>-->
+              <br>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Upload</button>
+        <button type="submit" class="btn btn-primary">Subir archivos</button>
 
       </form>
 
