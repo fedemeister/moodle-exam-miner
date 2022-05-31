@@ -232,6 +232,6 @@ def merge_df_columns_to_datetime64(merge_df: pd.DataFrame, num_preguntas: int) -
         merge_df con las columnas _t en formato datetime.
     """
 
-    columnas_preguntas_t = ['Q' + str(i + 1) + '_t' for i in range(num_preguntas)]
+    columnas_preguntas_t = ['Q' + str(i) + '_t' for i in range(num_preguntas + 1)]
     merge_df[columnas_preguntas_t] = merge_df[columnas_preguntas_t].apply(pd.to_datetime)
     return merge_df
