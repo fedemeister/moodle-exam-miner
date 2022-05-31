@@ -4,6 +4,8 @@ import numpy as np  # linear algebra
 import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
 from datetime import datetime
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
 
 def convert(o) -> int:  # hay que convertir los np.int64 a enteros porque np.int64 is not JSON serializable
     if isinstance(o, np.int64):
@@ -65,17 +67,19 @@ def duracion_a_segundos(fecha: str) -> int:
     return int(segundos)
 
 
-def formateo_json(my_json: list, devolver: bool = False) -> list:
+def formateo_json(my_json: list, num_preguntas: int, devolver: bool = False) -> list:
     """
     Formatea el JSON para dejarlo con las columnas de las notas en formato float,
     la columna de duración del examen como un número entero y las columnas de Inicio y Fin como datetime:
 
     Parameters:
+        num_preguntas (int): Número de preguntas que tiene cada examen
         devolver (bool): Si es True: devuelve el json formateado por parámetro
         my_json (list): JSON sin procesar
     Returns:
         NO DEVUELVE NADA, MODIFICA EL JSON RECIBIDO si "devolver" es False
     """
+    preg_final = 8 + num_preguntas + 1
     for alumno in my_json:
         if alumno[0] != 'Promedio general':
             for i in range(5, 7):
@@ -92,7 +96,7 @@ def formateo_json(my_json: list, devolver: bool = False) -> list:
                     alumno[8] = alumno[8].replace(",", ".")
                     alumno[8] = float(alumno[8])
             else:
-                for i in range(8, 19):
+                for i in range(8, preg_final):
                     if alumno[i] == '-':
                         alumno[i] = alumno[i].replace("-", "0.00")
                         alumno[i] = float(alumno[i])
@@ -100,7 +104,7 @@ def formateo_json(my_json: list, devolver: bool = False) -> list:
                         alumno[i] = alumno[i].replace(",", ".")
                         alumno[i] = float(alumno[i])
         else:
-            for i in range(8, 19):
+            for i in range(8, preg_final):
                 alumno[i] = alumno[i].replace(",", ".")
     if devolver:
         return my_json
@@ -113,12 +117,13 @@ def json_to_dataframe(my_json: list, my_columns: list) -> pd.DataFrame:
     return df
 
 
-def create_marks_and_answers_df(json_exam_marks, json_exam_answers) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    columnas = ['Apellidos', 'Nombre', 'Código', 'Email', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota',
-                'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10']
+def create_marks_and_answers_df(json_exam_marks, json_exam_answers, num_preguntas) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    columnas_basicas = ['Apellidos', 'Nombre', 'Código', 'Email', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota']
+    columnas_preguntas = ['Q' + str(i + 1) for i in range(num_preguntas)]
+    columnas = columnas_basicas + columnas_preguntas
 
-    json_exam_marks = formateo_json(json_exam_marks, devolver=True)
-    json_exam_answers = formateo_json(json_exam_answers, devolver=True)
+    json_exam_marks = formateo_json(json_exam_marks, num_preguntas, devolver=True)
+    json_exam_answers = formateo_json(json_exam_answers, num_preguntas, devolver=True)
 
     marks_df = json_to_dataframe(json_exam_marks, columnas)
     answers_df = json_to_dataframe(json_exam_answers, columnas)

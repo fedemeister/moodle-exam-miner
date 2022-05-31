@@ -51,6 +51,14 @@ def clean_df_xml(df_xml_output: pd.DataFrame) -> pd.DataFrame:
                                                               regex=True)
     df_xml_output['Answer'] = df_xml_output['Answer'].replace([u'SELECTnacionalidad'], u'SELECT nacionalidad',
                                                               regex=True)
+    df_xml_output['Answer'] = df_xml_output['Answer'].replace(["'Gran Bretaña'GROUP BY"], "'Gran Bretaña' GROUP BY",
+                                                              regex=True)
+    df_xml_output['Answer'] = df_xml_output['Answer'].replace(["'Paginas'FROM autores"], "'Paginas' FROM autores",
+                                                              regex=True)
+    df_xml_output['Answer'] = df_xml_output['Answer'].replace(["libros LWHERE A.id = L.autor_id"],
+                                                              "libros L WHERE A.id = L.autor_id",
+                                                              regex=True)
+
     return df_xml_output
 
 
@@ -66,7 +74,8 @@ def limpiar_respuestas_df(df: pd.DataFrame, Q: int):
     df['Q' + str(Q)] = df['Q' + str(Q)].replace([u'SELECTnacionalidad'], u'SELECT nacionalidad', regex=True)
 
 
-def run_script05(answers_df: pd.DataFrame, df_xml_output: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
+def run_script05(answers_df: pd.DataFrame, df_xml_output: pd.DataFrame, num_preguntas) -> Tuple[
+    pd.DataFrame, pd.Series, pd.DataFrame]:
     """
     En esta función vamos a hacer que las respuestas que vienen del conjunto XML y las que vienen a través del
     conjunto answers_df (que previamente viene del json answers) contengan los mismos elementos.
@@ -77,18 +86,20 @@ def run_script05(answers_df: pd.DataFrame, df_xml_output: pd.DataFrame) -> Tuple
         answers_df: Dataframe con las respuestas de cada alumno (nombre, email, respuestas, tiempo, etc)
         df_xml_output: Dataframe sacado del script02 que contiene las preguntas y las respuestas del conjunto
             contenido en el XML que sube el profesor a la plataforma.
+        num_preguntas: número de preguntas que tiene el examen (se calcula al principio del algoritmo y se va usando)
 
     Returns:
         df_xml_cleaned, df_check, answers_df_cleaned.
     """
 
-    [limpiar_respuestas_df(answers_df, i) for i in range(1, 11)]  # limpia cada columna modificando answers_df
+    # limpia cada columna modificando answers_df
+    [limpiar_respuestas_df(answers_df, i) for i in range(1, num_preguntas + 1)]
 
     # utilizamos el dataframe con las preguntas ya limpias de caracteres extraños
     answers_df_cleaned = answers_df
 
     respuestas = []
-    for i in range(1, 11):
+    for i in range(1, num_preguntas + 1):
         lista = list(answers_df_cleaned["Q" + str(i)])
         respuestas.append(lista)
 

@@ -5,49 +5,50 @@ import pandas as pd
 import json
 
 
-def merge_dataframes(py_collaboartor_df: pd.DataFrame, respuestas_df: pd.DataFrame, preguntas_df: pd.DataFrame,
-                     hora_respuestas_df: pd.DataFrame) -> pd.DataFrame:
+def merge_dataframes(py_cheat_df: pd.DataFrame, respuestas_df: pd.DataFrame, preguntas_df: pd.DataFrame,
+                     hora_respuestas_df: pd.DataFrame, marks_df: pd.DataFrame, num_preguntas: int) -> pd.DataFrame:
     """
     Esta función une cada uno de los dataframes de entrada en un único dataframe
     Args:
-        py_collaboartor_df: Dataframe pycollaborator.
+        py_cheat_df: Dataframe py_collaborator.
         respuestas_df: Dataframe de las respuestas de los estudiantes durante el examen.
         preguntas_df: Dataframe sacado del XML con el conjunto global de preguntas ya limpio.
         hora_respuestas_df: Dataframe con las horas de cada respuesta para cada estudiante.
-
+        marks_df: Dataframe con las notas para cada respuesta que tuvieron los estudiantes
+        num_preguntas: número de preguntas que tiene el examen (se calcula al principio del algoritmo y se va usando)
     Returns:
         Un dataframe "merge_df" que tiene todos la información unida.
     """
-    merge_df = pd.DataFrame(data=py_collaboartor_df[['Nombre', 'Código', 'Tiempo',
-                                                     'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']],
-                            columns=['Nombre', 'Código', 'Tiempo',
-                                     'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad',
-                                     'Q0_t', 'Q0_q', 'Q0_a', 'Q0_m',
-                                     'Q1_t', 'Q1_q', 'Q1_a', 'Q1_m',
-                                     'Q2_t', 'Q2_q', 'Q2_a', 'Q2_m',
-                                     'Q3_t', 'Q3_q', 'Q3_a', 'Q3_m',
-                                     'Q4_t', 'Q4_q', 'Q4_a', 'Q4_m',
-                                     'Q5_t', 'Q5_q', 'Q5_a', 'Q5_m',
-                                     'Q6_t', 'Q6_q', 'Q6_a', 'Q6_m',
-                                     'Q7_t', 'Q7_q', 'Q7_a', 'Q7_m',
-                                     'Q8_t', 'Q8_q', 'Q8_a', 'Q8_m',
-                                     'Q9_t', 'Q9_q', 'Q9_a', 'Q9_m',
-                                     'Q10_t', 'Q10_q', 'Q10_a', 'Q10_m'])
+    columnas_basicas = ['Nombre', 'Código', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']
+    columnas_q0 = ['Q0_t', 'Q0_q', 'Q0_a', 'Q0_m']
+    columnas_preguntas_t = ['Q' + str(i + 1) + '_t' for i in range(num_preguntas)]
+    columnas_preguntas_q = ['Q' + str(i + 1) + '_q' for i in range(num_preguntas)]
+    columnas_preguntas_a = ['Q' + str(i + 1) + '_a' for i in range(num_preguntas)]
+    columnas_preguntas_m = ['Q' + str(i + 1) + '_m' for i in range(num_preguntas)]
+
+    columnas_finales = columnas_q0 + columnas_basicas + columnas_preguntas_t + columnas_preguntas_q + \
+                       columnas_preguntas_a + columnas_preguntas_m
+    merge_df = pd.DataFrame(data=py_cheat_df[['Nombre', 'Código', 'Tiempo',
+                                              'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']]
+                            , columns=columnas_finales)
 
     for i in range(0, merge_df.shape[0]):
         merge_df['Q0_t'][i] = respuestas_df['Inicio'][i]
         merge_df['Q0_a'][i] = '-'
         merge_df['Q0_q'][i] = '-'
         merge_df['Q0_m'][i] = 0
-        for x in range(1, 11):
+        for x in range(1, num_preguntas + 1):
             # merge_df['Código'][i] = respuestas_df['Código'][i]
             aux = respuestas_df['Q' + str(x)][i]
+            nota = float(marks_df['Q' + str(x)][i])
             time = hora_respuestas_df['Q' + str(x) + '_t'][i]
+            pregunta = \
+                preguntas_df['Question'][(preguntas_df['Answer'] == aux) & (preguntas_df['Mark'] == nota)].values[0]
             if aux != '-':
                 merge_df['Q' + str(x) + '_t'][i] = time
                 merge_df['Q' + str(x) + '_a'][i] = aux
-                merge_df['Q' + str(x) + '_q'][i] = preguntas_df['Question'][preguntas_df['Answer'] == aux].values[0]
-                merge_df['Q' + str(x) + '_m'][i] = preguntas_df['Mark'][preguntas_df['Answer'] == aux].values[0]
+                merge_df['Q' + str(x) + '_q'][i] = pregunta
+                merge_df['Q' + str(x) + '_m'][i] = nota
             else:
                 merge_df['Q' + str(x) + '_t'][i] = time
                 merge_df['Q' + str(x) + '_a'][i] = aux
@@ -63,7 +64,7 @@ def misma_pregunta_luego(x, pregunta: str, respuesta: str, hora_respuesta, merge
     Esta función sirve para la función CA (Conocimiento Acumulado) que mide una posible cadena de colaboración
     entre los estudiantes encadenando preguntas correctamente respondidas.
     Args:
-        x: Número de la pregunta (1 a la 10).
+        x: Número de la pregunta (1 a num_preguntas).
         pregunta: Pregunta que estamos mirando (depende del valor de X que marca qué orden de pregunta fue).
         respuesta: Respuesta que se utilizó.
         hora_respuesta: Hora en la que se respondió.
@@ -74,12 +75,13 @@ def misma_pregunta_luego(x, pregunta: str, respuesta: str, hora_respuesta, merge
         o puede devolver 0, False si no encuentra ese estudiante.
     """
     if len(merge_df['Código'][
-            (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)]) > 0:
+               (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)]) > 0:
         cod1 = merge_df['Código'][
-            (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)].iloc[0]
+            (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)].iloc[
+            0]  # el siguiente
         if len(merge_df['Código'][
-                (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
-                (merge_df['Q' + str(x) + '_a'] == respuesta)]) > 0:
+                   (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
+                   (merge_df['Q' + str(x) + '_a'] == respuesta)]) > 0:
             cod2 = merge_df['Código'][
                 (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
                 (merge_df['Q' + str(x) + '_a'] == respuesta)].iloc[0]  # el siguiente
@@ -90,7 +92,7 @@ def misma_pregunta_luego(x, pregunta: str, respuesta: str, hora_respuesta, merge
         return False, '0'
 
 
-def CA(i: int, merge_df: pd.DataFrame) -> {}:
+def CA(i: int, merge_df: pd.DataFrame, num_preguntas: int) -> {}:
     """
     CA (Conocimiento Acumulado) es una función que mide una posible red sospechosa de intercambio de preguntas
     observando si se producen cadenas de estudiantes que van respondiendo la misma pregunta de forma seguida
@@ -98,7 +100,7 @@ def CA(i: int, merge_df: pd.DataFrame) -> {}:
     Args:
         i: estudiante_sub_i
         merge_df: Dataframe con todos los datos que vamos a consultar para acceder únicamente a un dataframe.
-
+        num_preguntas: número de preguntas que tiene el examen (se calcula al principio del algoritmo y se va usando)
     Returns:
         El conocimiento acumulado del estudiante (preguntas que el siguiente estudiante que la tuvo, respondió
         también correctamente)
@@ -115,7 +117,7 @@ def CA(i: int, merge_df: pd.DataFrame) -> {}:
     lista_CA_i = []  # 1 si es pregunta 1, 2 si es pregunta 2 y así sucesivamente
     lista_CA_p = []  # pregunta
     lista_CA_c = []  # código del alumno o userXYZ
-    for x in range(1, 11):
+    for x in range(1, num_preguntas + 1):
         pregunta = merge_df['Q' + str(x) + '_q'][i]
         puntuacion = merge_df['Q' + str(x) + '_m'][i]
         respuesta = merge_df['Q' + str(x) + '_a'][i]
@@ -143,7 +145,7 @@ def CA(i: int, merge_df: pd.DataFrame) -> {}:
     return student
 
 
-def ratio_preg(i, preguntas_df, merge_df, verbose=True) -> {}:
+def ratio_preg(i: int, preguntas_df: pd.DataFrame, merge_df: pd.DataFrame, num_preguntas: int, verbose=True) -> {}:
     """
     Ratio de aciertos y fallos para cada pregunta
     Args:
@@ -151,6 +153,7 @@ def ratio_preg(i, preguntas_df, merge_df, verbose=True) -> {}:
         preguntas_df: Dataframe sacado del XML con el conjunto global de preguntas ya limpio.
         merge_df: Dataframe con todos los datos que vamos a consultar para acceder únicamente a un dataframe.
         verbose: True por defecto para devolver la mayor cantidad de detalle para la salida.
+        num_preguntas: número de preguntas que tiene el examen (se calcula al principio del algoritmo y se va usando)
 
     Returns:
 
@@ -159,7 +162,7 @@ def ratio_preg(i, preguntas_df, merge_df, verbose=True) -> {}:
     preg = preguntas_df['Question'].iloc[i]
     lista_c = []
     lista_i = []
-    for x in range(1, 11):
+    for x in range(1, num_preguntas + 1):
         len_p = len(merge_df['Q' + str(x) + '_q'][merge_df['Q' + str(x) + '_q'] == preg])
         if len_p > 1:
             lista_c = merge_df['Q' + str(x) + '_a'][
@@ -194,48 +197,41 @@ def ratio_preg(i, preguntas_df, merge_df, verbose=True) -> {}:
     return questions
 
 
-def run_script07(answers_df_cleaned, df_xml_cleaned, answer_times_merged_df, py_cheat_df) -> \
+def run_script07(answers_df_cleaned, df_xml_cleaned, answer_times_merged_df, py_cheat_df, marks_df, num_preguntas) -> \
         Tuple[pd.DataFrame, Dict, Dict, List]:
-    merge_df = merge_dataframes(py_cheat_df, answers_df_cleaned, df_xml_cleaned, answer_times_merged_df)
+    merge_df = merge_dataframes(py_cheat_df, answers_df_cleaned, df_xml_cleaned, answer_times_merged_df, marks_df,
+                                num_preguntas)
 
     salida_preg = []
     for i in range(0, len(df_xml_cleaned), 4):
-        salida_preg.append(ratio_preg(i, df_xml_cleaned, merge_df, verbose=False))
+        salida_preg.append(ratio_preg(i, df_xml_cleaned, merge_df, num_preguntas, verbose=False))
 
     ratio_preguntas = {"questions": salida_preg}
 
     salida = []
     for i in range(len(merge_df)):
-        salida.append(CA(i, merge_df))
+        salida.append(CA(i, merge_df, num_preguntas))
 
     conocimiento_acumulado = {"students": salida}
 
     result = merge_df.to_json(index='Nombre', orient="index", date_format='iso', date_unit='s')
     merge_df_json = json.loads(result)
 
-    merge_df = merge_df_columns_to_datetime64(merge_df)
+    merge_df = merge_df_columns_to_datetime64(merge_df, num_preguntas)
 
     return merge_df, ratio_preguntas, conocimiento_acumulado, merge_df_json
 
 
-def merge_df_columns_to_datetime64(merge_df) -> pd.DataFrame:
+def merge_df_columns_to_datetime64(merge_df: pd.DataFrame, num_preguntas: int) -> pd.DataFrame:
     """
     Función que cambia las columnas con formato object a datetime64 para mayor precisión
     Args:
         merge_df: Dataframe con todos los datos que vamos a consultar para acceder únicamente a un dataframe.
-
+        num_preguntas: número de preguntas que tiene el examen (se calcula al principio del algoritmo y se va usando)
     Returns:
         merge_df con las columnas _t en formato datetime.
     """
-    merge_df['Q0_t'] = pd.to_datetime(merge_df['Q0_t'])
-    merge_df['Q1_t'] = pd.to_datetime(merge_df['Q1_t'])
-    merge_df['Q2_t'] = pd.to_datetime(merge_df['Q2_t'])
-    merge_df['Q3_t'] = pd.to_datetime(merge_df['Q3_t'])
-    merge_df['Q4_t'] = pd.to_datetime(merge_df['Q4_t'])
-    merge_df['Q5_t'] = pd.to_datetime(merge_df['Q5_t'])
-    merge_df['Q6_t'] = pd.to_datetime(merge_df['Q6_t'])
-    merge_df['Q7_t'] = pd.to_datetime(merge_df['Q7_t'])
-    merge_df['Q8_t'] = pd.to_datetime(merge_df['Q8_t'])
-    merge_df['Q9_t'] = pd.to_datetime(merge_df['Q9_t'])
-    merge_df['Q10_t'] = pd.to_datetime(merge_df['Q10_t'])
+
+    columnas_preguntas_t = ['Q' + str(i + 1) + '_t' for i in range(num_preguntas)]
+    merge_df[columnas_preguntas_t] = merge_df[columnas_preguntas_t].apply(pd.to_datetime)
     return merge_df

@@ -10,8 +10,6 @@ def nube_puntos(df_nube_puntos):
                              hover_name="Código",
                              hover_data=["Tiempo"],
                              size="Segundos",
-                             # marginal_x="box",
-                             # marginal_y="violin",
                              trendline="lowess",
                              title="Nube de puntos para los exámenes. El tamaño del círculo son los segundos empleados en el examen.")
 
@@ -37,5 +35,4 @@ def nube_puntos(df_nube_puntos):
             type="date"
         )
     )
-    print("def nube_puntos(df_nube_puntos):")
     return nube_puntos

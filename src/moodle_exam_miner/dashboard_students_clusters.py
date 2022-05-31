@@ -2,18 +2,21 @@ import pandas as pd
 from datetime import timedelta
 
 
-def funcion_clusters(py_cheat_df, merge_df):
+def funcion_clusters(py_cheat_df, merge_df, config_num_stud_cluster, config_dif_minutos_cl, num_preguntas):
     py_cheat = py_cheat_df.copy()
     lista_i = []
     lista_j = []
     for i in range(0, len(py_cheat)):
         for j in range(0, len(py_cheat)):
             if (
+                    (py_cheat.iloc[i]['Nota'] <= py_cheat.iloc[j]['Nota']) &
                     (
-                        (py_cheat.iloc[i]['Fin'] == (py_cheat.iloc[j]['Inicio'] + timedelta(minutes=1))) |
-                        (py_cheat.iloc[i]['Fin'] == (py_cheat.iloc[j]['Inicio'] - timedelta(minutes=1))) |
-                        (py_cheat.iloc[i]['Fin'] == py_cheat.iloc[j]['Inicio'])
-                    ) & (py_cheat.iloc[i]['Nota'] <= py_cheat.iloc[j]['Nota'])
+                            (py_cheat.iloc[i]['Fin'] >= (
+                                    py_cheat.iloc[j]['Inicio'] - timedelta(minutes=config_dif_minutos_cl)))
+                            &
+                            (py_cheat.iloc[i]['Fin'] <= (
+                                    py_cheat.iloc[j]['Inicio'] + timedelta(minutes=config_dif_minutos_cl)))
+                    )
             ):
                 lista_i.append(py_cheat.iloc[i]['Código'])
                 lista_j.append(py_cheat.iloc[j]['Código'])
@@ -34,7 +37,7 @@ def funcion_clusters(py_cheat_df, merge_df):
             flag_encontrado = False
             for cluster in range(0, len(lista_de_cluster)):
                 if usuario == lista_de_cluster[cluster][-1] and longitud_minitabla > 1:  # preparamos los cluster
-                    # para alvergar los nuevos
+                    # para albergar los nuevos
                     flag_encontrado = True
                     for f in range(0, longitud_minitabla - 1):
                         cluster_a_copiar = lista_de_cluster[cluster].copy()
@@ -44,7 +47,7 @@ def funcion_clusters(py_cheat_df, merge_df):
                         flag_encontrado = True
             if flag_encontrado:
                 count = 0
-                for cluster2 in range(0, len(lista_de_cluster)):  # alvergamos los nuevos
+                for cluster2 in range(0, len(lista_de_cluster)):  # albergamos los nuevos
                     if usuario == lista_de_cluster[cluster2][-1]:
                         count += 1
 
@@ -60,7 +63,7 @@ def funcion_clusters(py_cheat_df, merge_df):
                     operacion = int(operacion)
                     jotas = jotas * operacion
                     jotas.sort()
-                    for cluster2 in range(0, len(lista_de_cluster)):  # alvergamos los nuevos
+                    for cluster2 in range(0, len(lista_de_cluster)):  # alojamos los nuevos
                         if usuario == lista_de_cluster[cluster2][-1]:
                             lista_de_cluster[cluster2].append(jotas[-1])
                             jotas.pop()
@@ -72,7 +75,8 @@ def funcion_clusters(py_cheat_df, merge_df):
     lista_usuarios_sin_repetir = []
     lista_de_cluster_2 = []
     for row in lista_de_cluster:
-        if len(row) > 3:
+        # para formar un cluster hay que tener al menos config_num_stud_cluster estudiantes (parámetro web)
+        if len(row) >= config_num_stud_cluster:
             for user in row:
                 if user not in lista_usuarios_sin_repetir:
                     lista_usuarios_sin_repetir.append(user)
@@ -87,26 +91,17 @@ def funcion_clusters(py_cheat_df, merge_df):
     df_merged2.reset_index(drop=True, inplace=True)
 
     for i in range(0, len(df_merged2)):
-        for j in range(2, 11):
+        for j in range(2, num_preguntas + 1):
             aux = j - 1
-            df_merged2['Q' + str(j) + '_m'][i] = df_merged2['Q' + str(j) + '_m'][i] + df_merged2['Q' + str(aux) + '_m'][
-                i]
+            df_merged2['Q' + str(j) + '_m'][i] = \
+                df_merged2['Q' + str(j) + '_m'][i] + df_merged2['Q' + str(aux) + '_m'][i]
 
-    df_merged2 = df_merged2.rename(columns={'Q0_m': 'Pregunta 0',
-                                            'Q1_m': 'Pregunta 1',
-                                            'Q2_m': 'Pregunta 2',
-                                            'Q3_m': 'Pregunta 3',
-                                            'Q4_m': 'Pregunta 4',
-                                            'Q5_m': 'Pregunta 5',
-                                            'Q6_m': 'Pregunta 6',
-                                            'Q7_m': 'Pregunta 7',
-                                            'Q8_m': 'Pregunta 8',
-                                            'Q9_m': 'Pregunta 9',
-                                            'Q10_m': 'Pregunta 10',
-                                            })
+    # transformamos las columnas Q0_m, Q1_m... a Pregunta 0, Pregunta 1...
+    for preg in range(0, num_preguntas + 1):
+        df_merged2 = df_merged2.rename(columns={'Q' + str(preg) + '_m': 'Pregunta ' + str(preg)})
 
     df_final = pd.DataFrame()
-    for x in range(0, 11):
+    for x in range(0, num_preguntas + 1):
         melt = pd.melt(df_merged2,
                        id_vars=['Código', 'Tiempo', 'Productividad', 'Q' + str(x) + '_t', 'Q' + str(x) + '_q',
                                 'Q' + str(x) + '_a'],
@@ -126,11 +121,17 @@ def funcion_clusters(py_cheat_df, merge_df):
     df_definitivo = pd.DataFrame(columns=df_final.columns)
     id_cluster = 1
 
-    for cluster in lista_de_cluster_2:
-        for user in cluster:
-            df_aux = df_final[df_final['Código'] == user]
-            df_aux['Cluster'] = 'Cluster ' + str(id_cluster)
-            df_definitivo = df_definitivo.append(df_aux)
-        id_cluster = id_cluster + 1
+    if len(lista_de_cluster_2) > 0:
+        for cluster in lista_de_cluster_2:
+            for user in cluster:
+                df_aux = df_final[df_final['Código'] == user]
+                df_aux['Cluster'] = 'Cluster ' + str(id_cluster)
+                df_definitivo = df_definitivo.append(df_aux)
+            id_cluster = id_cluster + 1
+    else:
+        df_aux = df_final[df_final['Código'] == py_cheat.iloc[0]['Código']]
+        df_aux['Cluster'] = 'Cluster ' + str(id_cluster)
+        df_definitivo = df_definitivo.append(df_aux)
+        print("no cluster")
 
     return df_definitivo

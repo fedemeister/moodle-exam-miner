@@ -1,13 +1,17 @@
 from flask import Flask, render_template, redirect, request
 import time
-from io import BytesIO
+from io import BytesIO, open
 import zipfile
 import os
 from flask import send_file
 import plotly.express as px
 from dash import dcc, html, Input, Output
+import json
+import warnings
 
 app = Flask(__name__, template_folder='web/mem_flask/templates', static_folder='web/mem_flask/static')
+
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 @app.route('/zipped_data')
@@ -26,23 +30,29 @@ def zipped_data():
                      as_attachment=True)
 
 
-from scripts.script0.input_coding_to_utf8 import jsons_to_utf8
-from scripts.script1.anonymize_input import anonymizer
-from scripts.script2.questions import run_script02
-from scripts.script3.answers_and_califications_dataframe import create_marks_and_answers_df
-from scripts.script4.answer_times import get_answer_times_df
-import scripts.script5.answers_and_questions_cleaned as script5
-import scripts.script6.py_collaborator_outputs as script6
-import scripts.script7.acumulated_knowladge as script7
-from scripts.script8.student_exam_logs import get_student_exam_logs
-from scripts.script_dashboard import scatter_plot
-from scripts.script_dashboard import students_chart
-from scripts.script_dashboard import students_clusters
-from scripts.script_dashboard import questions_chart
+from src.moodle_exam_miner.script0_jsons_to_utf8 import jsons_to_utf8
+from src.moodle_exam_miner.script1_anonymize_input import anonymizer
+from src.moodle_exam_miner.script2_questions import run_script02
+from src.moodle_exam_miner.script3_answers_and_califications_dataframe import create_marks_and_answers_df
+from src.moodle_exam_miner.script4_answer_times import get_answer_times_df
+import src.moodle_exam_miner.script5_answers_and_questions_cleaned as script5
+import src.moodle_exam_miner.script6_py_collaborator_outputs as script6
+import src.moodle_exam_miner.script7_acumulated_knowladge as script7
+from src.moodle_exam_miner import dashboard_scatter_plot
+from src.moodle_exam_miner import dashboard_students_chart
+from src.moodle_exam_miner import dashboard_students_clusters
+from src.moodle_exam_miner import dashboard_questions_chart
 
 
 @app.route('/scripts_run')
 def scripts_run():
+    tic = time.perf_counter()
+    with open('files/tool_input/config.json', 'r') as f:
+        config = json.load(f)
+
+    config_num_stud_cluster = int(config['config_num_stud_cluster'])
+    config_dif_minutos_cl = int(config['config_dif_minutos_cl'])
+
     # SCRIPT 0
     json_marks_utf8, json_logs_utf8, json_answers_utf8 = jsons_to_utf8()
 
@@ -52,39 +62,39 @@ def scripts_run():
         json_logs_utf8,
         json_answers_utf8)
 
+    num_preguntas = int(len(json_marks_utf8[0][0][9:]))
     # SCRIPT 2
     df_xml_output = run_script02()
 
     # SCRIPT 3
-    marks_df, answers_df = create_marks_and_answers_df(json_exam_marks_anon, json_exam_answers_anon)
-    # marks_df, answers_df = create_marks_and_answers_df(json_marks_utf8, json_answers_utf8)
+    marks_df, answers_df = create_marks_and_answers_df(json_exam_marks_anon, json_exam_answers_anon, num_preguntas)
 
     # SCRIPT 4
-    answer_times_merged_df = get_answer_times_df(marks_df, json_logs_anon)
-    # answer_times_merged_df = get_answer_times_df(marks_df, json_logs_utf8)
+    answer_times_merged_df = get_answer_times_df(marks_df, json_logs_anon, num_preguntas)
 
     # SCRIPT 5
-    df_xml_cleaned, df_check, answers_df_cleaned = script5.run_script05(answers_df, df_xml_output)
+    df_xml_cleaned, df_check, answers_df_cleaned = script5.run_script05(answers_df, df_xml_output, num_preguntas)
 
     # SCRIPT 6
-    py_collaborator, py_cheat_df = script6.run_pycollaborator(answers_df_cleaned, marks_df)
-
+    py_collaborator, py_cheat_df = script6.run_pycollaborator(answers_df_cleaned, marks_df, num_preguntas)
     # SCRIPT 7
     merge_df, ratio_preguntas, conocimiento_acumulado, merge_df_json = script7.run_script07(answers_df_cleaned,
                                                                                             df_xml_cleaned,
                                                                                             answer_times_merged_df,
-                                                                                            py_cheat_df)
-
-    # SCRIPT 8
-    student_exam_logs, student_exam_logs_name = get_student_exam_logs(merge_df, json_logs_anon)
-
+                                                                                            py_cheat_df,
+                                                                                            marks_df,
+                                                                                            num_preguntas)
     # DASHBOARD
-    nube_puntos = scatter_plot.nube_puntos(py_cheat_df)
-    fig_estudiantes = students_chart.fig_estudiantes(merge_df)
+    nube_puntos = dashboard_scatter_plot.nube_puntos(py_cheat_df)
+    fig_estudiantes = dashboard_students_chart.fig_estudiantes(merge_df, num_preguntas)
 
-    df_clusters_total = students_clusters.funcion_clusters(py_cheat_df, merge_df)
+    df_clusters_total = dashboard_students_clusters.funcion_clusters(py_cheat_df,
+                                                                     merge_df,
+                                                                     config_num_stud_cluster,
+                                                                     config_dif_minutos_cl,
+                                                                     num_preguntas)
 
-    questions_chart_df = questions_chart.questions_chart(merge_df)
+    questions_chart_df = dashboard_questions_chart.questions_chart(merge_df, num_preguntas)
     all_questions = questions_chart_df['Número'].unique()
     all_clusters = df_clusters_total.Cluster.unique()
     from web.dash_app import create_dash_application
@@ -233,6 +243,8 @@ def scripts_run():
             dcc.Graph(id="fig_questions")
         ])
     ])
+    toc = time.perf_counter()
+    print(f"run_scripts {toc - tic:0.4f} seconds")
 
     return redirect('dash')
 
@@ -275,6 +287,16 @@ def allowed_extensions(filename):
 @app.route('/scripts', methods=['POST', 'GET'])
 def scripts():
     if request.method == "POST":
+        config_num_stud_cluster = request.form['flexRadioDefault']
+        config_dif_minutos_cl = request.form['radioFormMinutos']
+
+        dictionary = {
+            "config_num_stud_cluster": config_num_stud_cluster,
+            "config_dif_minutos_cl": config_dif_minutos_cl
+        }
+
+        with open("files/tool_input/config.json", "w") as outfile:
+            json.dump(dictionary, outfile)
 
         files = request.files.getlist("formFileMultiple")
         if len(files) == 0:

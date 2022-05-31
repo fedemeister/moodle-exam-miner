@@ -12,18 +12,24 @@ def estudiantes_con_menor_productividad(productividad: float, df_estudiantes: pd
     return df_estudiantes["Productividad"] <= productividad
 
 
-def respuestas_del_estudiante(codigo: str, respuestas_df: pd.DataFrame) -> bool:
+def respuestas_del_estudiante(codigo: str, respuestas_df: pd.DataFrame, num_preguntas) -> bool:
     estudiante = respuestas_df[respuestas_df["Código"] == codigo]
-    return estudiante[["Código", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10"]]
+    columnas_basicas = ['Código']
+    columnas_preguntas = ['Q' + str(i + 1) for i in range(num_preguntas)]
+    columnas_finales = columnas_basicas + columnas_preguntas
+    return estudiante[columnas_finales]
 
 
-def calificaciones_del_estudiante(codigo: str, calificaciones_df: pd.DataFrame) -> bool:
+def calificaciones_del_estudiante(codigo: str, calificaciones_df: pd.DataFrame, num_preguntas) -> bool:
     calificaciones = calificaciones_df[calificaciones_df["Código"] == codigo]
-    return calificaciones[["Código", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10"]]
+    columnas_basicas = ['Código']
+    columnas_preguntas = ['Q' + str(i + 1) for i in range(num_preguntas)]
+    columnas_finales = columnas_basicas + columnas_preguntas
+    return calificaciones[columnas_finales]
 
 
 def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_df: pd.DataFrame,
-             calificaciones_df: pd.DataFrame) -> dict:
+             calificaciones_df: pd.DataFrame, num_preguntas) -> dict:
     """
     En esta función tratamos de sacar los estudiantes que han podido responder a alguna de las preguntas de manera
     sospechosa. Desde fuera vamos iterando para pasar por cada uno de los estudiantes y aquí los tratamos de manera iterativa.
@@ -37,6 +43,7 @@ def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_
         py_cheat_df: dataframe con los datos necesarios (productividad)
         respuestas_df: dataframe con los datos de los estudiantes + respuestas
         calificaciones_df: dataframe con los datos de los estudiantes + notas de cada respuesta
+        num_preguntas: número de preguntas que tiene el examen (se calcula al principio del algoritmo y se va usando)
 
     Returns:
         Devuelve los datos del estudiante junto con la lista de las respuestas a tener en cuenta (sospechosas)
@@ -57,11 +64,11 @@ def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_
 
     cod_estudiante = py_cheat_df["Código"][i]
 
-    respuestas_estudiante_i_df = respuestas_del_estudiante(cod_estudiante, respuestas_df)
-    calificaciones_estudiante_i_df = calificaciones_del_estudiante(cod_estudiante, calificaciones_df)
+    respuestas_estudiante_i_df = respuestas_del_estudiante(cod_estudiante, respuestas_df, num_preguntas)
+    calificaciones_estudiante_i_df = calificaciones_del_estudiante(cod_estudiante, calificaciones_df, num_preguntas)
 
     for z in range(len(df)):
-        df2 = respuestas_del_estudiante(df['Código'].iloc[z], respuestas_df)
+        df2 = respuestas_del_estudiante(df['Código'].iloc[z], respuestas_df, num_preguntas)
         respuestas_otros_df = pd.concat([respuestas_otros_df, df2], ignore_index=True)
 
     contador_de_respuestas = []
@@ -69,7 +76,7 @@ def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_
     student = {}
     lista_de_respuestas_a_tener_en_cuenta = []
 
-    for respuesta in range(1, 11):  # respuestas de la 1 a la 10
+    for respuesta in range(1, num_preguntas + 1):  # respuestas de la 1 a la 10
         answer = {}
         sospechosos_respuesta = []
         flag_not_answer = True
@@ -111,13 +118,14 @@ def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_
     return student
 
 
-def run_pycollaborator(answers_df, marks_df) -> Tuple[Dict[str, List[Dict]], pd.DataFrame]:
+def run_pycollaborator(answers_df, marks_df, num_preguntas) -> Tuple[Dict[str, List[Dict]], pd.DataFrame]:
     py_cheat_df = marks_df[["Nombre", "Código", "Tiempo", "Inicio", "Fin", "Segundos", "Nota"]]
     py_cheat_df["Productividad"] = (py_cheat_df["Nota"] / (py_cheat_df["Segundos"] / 60))
-    columnas = ["Código", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10"]
+    columnas = ['Q' + str(i + 1) for i in range(num_preguntas)]
 
     py_collaborator = []
-    [py_collaborator.append(function(i, columnas, py_cheat_df, answers_df, marks_df)) for i in range(len(py_cheat_df))]
+    [py_collaborator.append(function(i, columnas, py_cheat_df, answers_df, marks_df, num_preguntas)) for i in
+     range(len(py_cheat_df))]
 
     py_collaborator = {"students": py_collaborator}
 
