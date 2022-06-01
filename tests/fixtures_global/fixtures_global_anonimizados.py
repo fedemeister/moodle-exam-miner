@@ -4061,22 +4061,7 @@ def fixture_py_collaborator_anonymized():
                 'time_seconds': 1340,
                 'grade': 5.0,
                 'productividad': 0.22388059701492538,
-                'answers': [
-                    {
-                        'question_id': 8,
-                        'text': "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;",
-                        'score': -0.25,
-                        'counter': 1,
-                        'suspects': ['user2']
-                     },
-                    {
-                        'question_id': 9,
-                        'text': '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;',
-                        'score': 1.0,
-                        'counter': 1,
-                        'suspects': ['user2']
-                     }
-                ]
+                'answers': []
             }
         ]}
 
@@ -4129,71 +4114,74 @@ def fixture_py_cheat_df_anonymized():
 
 @pytest.fixture(scope='session')
 def fixture_merge_df_anonymized():
-    columnas = ['Nombre', 'Código', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad',
-                'Q0_t', 'Q0_q', 'Q0_a', 'Q0_m', 'Q1_t', 'Q1_q', 'Q1_a', 'Q1_m',
-                'Q2_t', 'Q2_q', 'Q2_a', 'Q2_m', 'Q3_t', 'Q3_q', 'Q3_a', 'Q3_m',
-                'Q4_t', 'Q4_q', 'Q4_a', 'Q4_m', 'Q5_t', 'Q5_q', 'Q5_a', 'Q5_m',
-                'Q6_t', 'Q6_q', 'Q6_a', 'Q6_m', 'Q7_t', 'Q7_q', 'Q7_a', 'Q7_m',
-                'Q8_t', 'Q8_q', 'Q8_a', 'Q8_m', 'Q9_t', 'Q9_q', 'Q9_a', 'Q9_m',
-                'Q10_t', 'Q10_q', 'Q10_a', 'Q10_m']
+    columnas = ['Nombre', 'Q0_t', 'Q0_q', 'Q0_a', 'Q0_m', 'Código', 'Tiempo', 'Inicio', 'Fin',
+                'Segundos', 'Nota', 'Productividad', 'Q1_t', 'Q2_t', 'Q3_t', 'Q4_t',
+                'Q5_t', 'Q6_t', 'Q7_t', 'Q8_t', 'Q9_t', 'Q10_t', 'Q1_q', 'Q2_q', 'Q3_q',
+                'Q4_q', 'Q5_q', 'Q6_q', 'Q7_q', 'Q8_q', 'Q9_q', 'Q10_q', 'Q1_a', 'Q2_a',
+                'Q3_a', 'Q4_a', 'Q5_a', 'Q6_a', 'Q7_a', 'Q8_a', 'Q9_a', 'Q10_a', 'Q1_m',
+                'Q2_m', 'Q3_m', 'Q4_m', 'Q5_m', 'Q6_m', 'Q7_m', 'Q8_m', 'Q9_m', 'Q10_m']
     df = pd.DataFrame(
         [
             [
-                'user1',
-                'user1',
-                '22 minutos 31 segundos',
-                datetime(2020, 5, 22, 11, 0),
-                datetime(2020, 5, 22, 11, 22),
-                1351,
-                8.75,
-                0.38860103626943004,
+                'user1', #Nombre
+                datetime(2020, 5, 22, 11, 0),  # Q0_t
+                '-',  # Q0_q
+                '-',  # Q0_a
+                0.0,  # Q0_m
+                'user1', #Código
+                '22 minutos 31 segundos', #Tiempo
+                datetime(2020, 5, 22, 11, 0), #Inicio
+                datetime(2020, 5, 22, 11, 22), #Fin
+                1351, #Segundos
+                8.75, #Nota
+                0.38860103626943004, #Productividad
+                datetime(2020, 5, 22, 11, 1),  # Q1_t
+                datetime(2020, 5, 22, 11, 2),  # Q2_t
+                datetime(2020, 5, 22, 11, 4),  # Q3_t
+                datetime(2020, 5, 22, 11, 9),  # Q4_t
+                datetime(2020, 5, 22, 11, 10),  # Q5_t
+                datetime(2020, 5, 22, 11, 12),  # Q6_t
+                datetime(2020, 5, 22, 11, 14),  # Q7_t
+                datetime(2020, 5, 22, 11, 16),  # Q8_t
+                datetime(2020, 5, 22, 11, 17),  # Q9_t
+                datetime(2020, 5, 22, 11, 22),  # Q10_t
+                'T1 - simple - NULL 2',  # Q1_q
+                'T1 - simple - ORDER BY',  # Q2_q
+                'T2 - funciones - count 6',  # Q3_q
+                'T3 - anidada funciones 08',  # Q4_q
+                'T3 - anidada simple 02',  # Q5_q
+                'T3 - exists - correlacionadas 06',  # Q6_q
+                'T4 - multiples 05',  # Q7_q
+                'T4 - multiples group by 06 o anidadas',  # Q8_q
+                'T4 - otros 06',  # Q9_q
+                'T5 - insert 02',  # Q10_q
+                'SELECT * FROM socios WHERE telefono IS NOT NULL;',  # Q1_a
+                'SELECT * FROM socios ORDER BY3, 4, 2;',  # Q2_a
+                '"SELECT COUNT(apellido2) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(telefono) FROM socios;"',# Q3_a
+                '... GROUP BY autor_id HAVING COUNT(*) >=ALL (SELECT COUNT(*) FROM libros GROUP BY autor_id));',  # Q4_a
+                "SELECT * FROM libros WHERE autor_id NOT IN (SELECT id FROM autores WHERE nombre = 'María' AND apellido1 = 'Dueñas' AND apellido2 = 'Vinuesa');",# Q5_a
+                "... WHERE id NOT IN (SELECT socio_id FROM prestamos WHERE libro_id IN (SELECT id FROM libros WHERE titulo LIKE 'Harry Potter%'));",# Q6_t
+                '...WHERE a.id = l.autor_id AND l.id = p.libro_id;',  # Q7_a
+                "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto';",# Q8_a
+                '... FROM socios s LEFT OUTER JOIN prestamos p ON p.socio_id = s.id LEFT OUTER JOIN libros l ON p.libro_id = l.id GROUP BY s.id, s.nombre, s.apellido1;',# Q9_a
+                "INSERT INTO socios VALUES (NULL, 'Angel', 'López', NULL, '656789456');",  # Q10_a
+                1.0, #Q1_m
+                1.0, #Q2_m
+                1.0, #Q3_m
+                1.0,#Q4_m
+                1.0,#Q5_m
+                1.0,#Q6_m
+                -0.25,#Q7_m
+                1.0,#Q8_m
+                1.0,#Q9_m
+                1.0#Q10_m
+            ],
+            [
+                'user0',
                 datetime(2020, 5, 22, 11, 0),
                 '-',
                 '-',
                 0.0,
-                datetime(2020, 5, 22, 11, 1),
-                'T1 - simple - NULL 2',
-                'SELECT * FROM socios WHERE telefono IS NOT NULL;',
-                1.0,
-                datetime(2020, 5, 22, 11, 2),
-                'T1 - simple - ORDER BY',
-                'SELECT * FROM socios ORDER BY3, 4, 2;',
-                1.0,
-                datetime(2020, 5, 22, 11, 4),
-                'T2 - funciones - count 6',
-                '"SELECT COUNT(apellido2) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(telefono) FROM socios;"',
-                1.0,
-                datetime(2020, 5, 22, 11, 9),
-                'T3 - anidada funciones 08',
-                '... GROUP BY autor_id HAVING COUNT(*) >=ALL (SELECT COUNT(*) FROM libros GROUP BY autor_id));',
-                1.0,
-                datetime(2020, 5, 22, 11, 10),
-                'T3 - anidada simple 02',
-                "SELECT * FROM libros WHERE autor_id NOT IN (SELECT id FROM autores WHERE nombre = 'María' AND apellido1 = 'Dueñas' AND apellido2 = 'Vinuesa');",
-                1.0,
-                datetime(2020, 5, 22, 11, 12),
-                'T3 - exists - correlacionadas 06',
-                "... WHERE id NOT IN (SELECT socio_id FROM prestamos WHERE libro_id IN (SELECT id FROM libros WHERE titulo LIKE 'Harry Potter%'));",
-                1.0,
-                datetime(2020, 5, 22, 11, 14),
-                'T4 - multiples 05',
-                '...WHERE a.id = l.autor_id AND l.id = p.libro_id;',
-                -0.25,
-                datetime(2020, 5, 22, 11, 16),
-                'T4 - multiples group by 06 o anidadas',
-                "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto';",
-                1.0,
-                datetime(2020, 5, 22, 11, 17),
-                'T4 - otros 06',
-                '... FROM socios s LEFT OUTER JOIN prestamos p ON p.socio_id = s.id LEFT OUTER JOIN libros l ON p.libro_id = l.id GROUP BY s.id, s.nombre, s.apellido1;',
-                1.0,
-                datetime(2020, 5, 22, 11, 22),
-                'T5 - insert 02',
-                "INSERT INTO socios VALUES (NULL, 'Angel', 'López', NULL, '656789456');",
-                1.0
-            ],
-            [
-                'user0',
                 'user0',
                 '23 minutos 46 segundos',
                 datetime(2020, 5, 22, 11, 0),
@@ -4201,63 +4189,53 @@ def fixture_merge_df_anonymized():
                 1426,
                 8.75,
                 0.36816269284712483,
-                datetime(2020, 5, 22, 11, 0),
-                '-',
-                '-',
-                0.0,
                 datetime(2020, 5, 22, 11, 2, 18),
-                #Timestamp('2020-05-22 11:02:18'),
-                'T1 - simple - LIKE 3',
-                "SELECT * FROM socios WHERE nombre not LIKE 'J%' AND nombre LIKE '%m%';",
-                1.0,
                 datetime(2020, 5, 22, 11, 4, 36),
-                #Timestamp('2020-05-22 11:04:36'),
-                'T1 - simple - DISTINCT 10',
-                'SELECT DISTINCT nacionalidad FROM autores ORDER BY 1 DESC;',
-                1.0,
                 datetime(2020, 5, 22, 11, 6, 54),
-                #Timestamp('2020-05-22 11:06:54'),
-                'T2 - funciones - count 2',
-                '10, 10, 7',
-                1.0,
                 datetime(2020, 5, 22, 11, 9, 12),
-                #Timestamp('2020-05-22 11:09:12'),
-                'T3 - anidada funciones 03',
-                '...GROUP BY autor_id HAVING AVG(paginas) >=ALL (SELECT AVG(paginas) FROM libros GROUP BY autor_id));',
-                1.0,
                 datetime(2020, 5, 22, 11, 11, 30),
-                #Timestamp('2020-05-22 11:11:30'),
-                'T3 - anidada simple 04',
-                "SELECT * FROM libros WHERE autor_id NOT IN (SELECT id FROM autores WHERE nacionalidad = 'Gran Bretaña');",
-                1.0,
                 datetime(2020, 5, 22, 11, 13, 48),
-                #Timestamp('2020-05-22 11:13:48'),
-                'T3 - exists - correlacionadas 02',
-                '... WHERE id NOT IN (SELECT libro_id FROM prestamos);',
-                1.0,
                 datetime(2020, 5, 22, 11, 16, 6),
-                #Timestamp('2020-05-22 11:16:06'),
-                'T4 - multiples 03',
-                '... WHERE s.id = socio_id AND l.id = libro_id GROUP BY s.idHAVINGDATEDIFF(p.fecha_fin, p.fecha) > 15;',
-                -0.25,
                 datetime(2020, 5, 22, 11, 18, 24),
-                #Timestamp('2020-05-22 11:18:24'),
-                'T4 - multiples group by 01',
-                "SELECT A.nombre, A.apellido1, sum(L.paginas) 'Paginas' FROM autores A, libros L WHERE A.id = L.autor_id GROUP BY A.nombre, A.apellido1;",
-                1.0,
                 datetime(2020, 5, 22, 11, 20, 42),
-                #Timestamp('2020-05-22 11:20:42'),
-                'T4 - otros 04',
-                '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id GROUP BY s.id;',
-                1.0,
                 datetime(2020, 5, 22, 11, 23),
-                #Timestamp('2020-05-22 11:23:00'),
+                'T1 - simple - LIKE 3',
+                'T1 - simple - DISTINCT 10',
+                'T2 - funciones - count 2',
+                'T3 - anidada funciones 03',
+                'T3 - anidada simple 04',
+                'T3 - exists - correlacionadas 02',
+                'T4 - multiples 03',
+                'T4 - multiples group by 01',
+                'T4 - otros 04',
                 'T5 - update 01',
+                "SELECT * FROM socios WHERE nombre not LIKE 'J%' AND nombre LIKE '%m%';",
+                'SELECT DISTINCT nacionalidad FROM autores ORDER BY 1 DESC;',
+                '10, 10, 7',
+                '...GROUP BY autor_id HAVING AVG(paginas) >=ALL (SELECT AVG(paginas) FROM libros GROUP BY autor_id));',
+                "SELECT * FROM libros WHERE autor_id NOT IN (SELECT id FROM autores WHERE nacionalidad = 'Gran Bretaña');",
+                '... WHERE id NOT IN (SELECT libro_id FROM prestamos);',
+                '... WHERE s.id = socio_id AND l.id = libro_id GROUP BY s.idHAVINGDATEDIFF(p.fecha_fin, p.fecha) > 15;',
+                "SELECT A.nombre, A.apellido1, sum(L.paginas) 'Paginas' FROM autores A, libros L WHERE A.id = L.autor_id GROUP BY A.nombre, A.apellido1;",
+                '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id GROUP BY s.id;',
                 "UPDATE socios SET apellido1='García' WHERE id=14;",
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                -0.25,
+                1.0,
+                1.0,
                 1.0
             ],
             [
                 'user2',
+                datetime(2020, 5, 22, 11, 59),
+                '-',
+                '-',
+                0.0,
                 'user2',
                 '14 minutos 13 segundos',
                 datetime(2020, 5, 22, 11, 59),
@@ -4265,52 +4243,53 @@ def fixture_merge_df_anonymized():
                 853,
                 2.5,
                 0.17584994138335286,
-                datetime(2020, 5, 22, 11, 59),
-                '-',
-                '-',
-                0.0,
                 datetime(2020, 5, 22, 12, 2),
-                'T1 - simple - NULL 2', 'SELECT * FROM socios WHERE telefono IS NOT NULL;',
-                1.0,
                 datetime(2020, 5, 22, 12, 3),
-                'T1 - simple - ORDER BY 5',
-                'SELECT * FROM socios ORDER BY nombre DESC, id ASC;',
-                -0.25,
                 datetime(2020, 5, 22, 12, 3),
-                'T2 - funciones - count 6',
-                '"SELECT COUNT(*) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(id) FROM socios;"',
-                -0.25,
                 datetime(2020, 5, 22, 12, 4),
-                'T3 - anidada funciones 02',
-                '... HAVING COUNT(*) <=ALL (SELECT count(*) FROM prestamos GROUP BY libro_id));',
-                -0.25,
                 datetime(2020, 5, 22, 12, 6),
-                'T3 - anidada simple 05',
-                "SELECT * FROM libros WHERE autor_id NOT IN (SELECT id FROM autores WHEREnacionalidad LIKE ('Gran Bretaña', 'España'));",
-                -0.25,
                 datetime(2020, 5, 22, 12, 7),
-                'T3 - exists - correlacionadas 03',
-                '... WHERE EXISTS (SELECT libro_id FROM prestamos);',
-                -0.25,
                 datetime(2020, 5, 22, 12, 9),
-                'T4 - multiples 04',
-                '... WHERE s.id = socio_id AND l.id = libro_id GROUP BY s.id, s.nombre, s.apellido1 HAVING AVG(DATEDIFF(p.fecha_fin, p.fecha)) > 15;',
-                1.0,
                 datetime(2020, 5, 22, 12, 10),
-                'T4 - multiples group by 06 o anidadas',
-                "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;",
-                -0.25,
                 datetime(2020, 5, 22, 12, 12),
-                'T4 - otros 05',
-                '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;',
-                1.0,
                 datetime(2020, 5, 22, 12, 14),
+                'T1 - simple - NULL 2',
+                'T1 - simple - ORDER BY 5',
+                'T2 - funciones - count 6',
+                'T3 - anidada funciones 02',
+                'T3 - anidada simple 05',
+                'T3 - exists - correlacionadas 03',
+                'T4 - multiples 04',
+                'T4 - multiples group by 06 o anidadas',
+                'T4 - otros 05',
                 'T5 - insert 04',
+                'SELECT * FROM socios WHERE telefono IS NOT NULL;',
+                'SELECT * FROM socios ORDER BY nombre DESC, id ASC;',
+                '"SELECT COUNT(*) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(id) FROM socios;"',
+                '... HAVING COUNT(*) <=ALL (SELECT count(*) FROM prestamos GROUP BY libro_id));',
+                "SELECT * FROM libros WHERE autor_id NOT IN (SELECT id FROM autores WHEREnacionalidad LIKE ('Gran Bretaña', 'España'));",
+                '... WHERE EXISTS (SELECT libro_id FROM prestamos);',
+                '... WHERE s.id = socio_id AND l.id = libro_id GROUP BY s.id, s.nombre, s.apellido1 HAVING AVG(DATEDIFF(p.fecha_fin, p.fecha)) > 15;',
+                "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;",
+                '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;',
                 "INSERT INTO socios (id, nombre, apellido1, apellido2) VALUES (NULL, 'Angel', 'López', 'Romero');",
+                1.0,
+                -0.25,
+                -0.25,
+                -0.25,
+                -0.25,
+                -0.25,
+                1.0,
+                -0.25,
+                1.0,
                 1.0
             ],
             [
                 'user3',
+                datetime(2020, 5, 22, 12, 57),
+                '-',
+                '-',
+                0.0,
                 'user3',
                 '22 minutos 20 segundos',
                 datetime(2020, 5, 22, 12, 57),
@@ -4318,49 +4297,45 @@ def fixture_merge_df_anonymized():
                 1340,
                 5.0,
                 0.22388059701492538,
-                datetime(2020, 5, 22, 12, 57),
-                '-',
-                '-',
-                0.0,
                 datetime(2020, 5, 22, 12, 58),
-                'T1 - simple - LIKE 3',
-                "SELECT * FROM socios WHERE nombre not LIKE 'J%' AND nombre LIKE '%m%';",
-                1.0,
                 datetime(2020, 5, 22, 13, 1),
-                'T1 - simple - DISTINCT 10',
-                'SELECT DISTINCT nacionalidad FROM autores ORDER BY 1;',
-                -0.25,
                 datetime(2020, 5, 22, 13, 3),
-                'T2 - funciones - count 7',
-                '"SELECT COUNT(apellido1) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(apellido2) FROM socios;"',
-                1.0,
                 datetime(2020, 5, 22, 13, 6),
-                'T3 - anidada funciones 09',
-                '... GROUP BY A1.nombre, A1.apellido1, A1.nacionalidad HAVING COUNT(*) <=ALL (SELECT COUNT(*) FROM autores A2, libros L2 WHERE A2.id = L2.autor_id GROUP BY A2.nombre, A2.apellido1, A2.nacionalidad) AND A1.nacionalidad = A2.nacionalidad;',
-                -0.25,
                 datetime(2020, 5, 22, 13, 8),
-                'T3 - anidada simple 01',
-                "SELECT * FROM libros WHERE autor_id IN (SELECT id FROM autores WHERE nombre = 'María' AND apellido1 = 'Dueñas' AND apellido2 = 'Vinuesa');",
-                1.0,
                 datetime(2020, 5, 22, 13, 9),
-                'T3 - exists - correlacionadas 06',
-                "... WHERE id NOT IN (SELECT socio_id FROM prestamos WHERE libro_id IN (SELECT id FROM libros WHERE titulo LIKE 'Harry Potter%'));",
-                1.0,
                 datetime(2020, 5, 22, 13, 12),
-                'T4 - multiples 07',
-                "... GROUP BY a.nombre, a.apellido1 HAVINGa.id = l.autor_id AND l.id = p.libro_id ANDa.nacionalidad = 'Gran Bretaña' ;",
-                -0.25,
                 datetime(2020, 5, 22, 13, 13),
-                'T4 - multiples group by 06 o anidadas',
-                "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;",
-                -0.25,
                 datetime(2020, 5, 22, 13, 14),
-                'T4 - otros 05',
-                '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;',
-                1.0,
                 datetime(2020, 5, 22, 13, 19),
+                'T1 - simple - LIKE 3',
+                'T1 - simple - DISTINCT 10',
+                'T2 - funciones - count 7',
+                'T3 - anidada funciones 09',
+                'T3 - anidada simple 01',
+                'T3 - exists - correlacionadas 06',
+                'T4 - multiples 07',
+                'T4 - multiples group by 06 o anidadas',
+                'T4 - otros 05',
                 'T5 - delete 01',
+                "SELECT * FROM socios WHERE nombre not LIKE 'J%' AND nombre LIKE '%m%';",
+                'SELECT DISTINCT nacionalidad FROM autores ORDER BY 1;',
+                '"SELECT COUNT(apellido1) FROM socios;" devolverá siempre el mismo resultado que "SELECT COUNT(apellido2) FROM socios;"',
+                '... GROUP BY A1.nombre, A1.apellido1, A1.nacionalidad HAVING COUNT(*) <=ALL (SELECT COUNT(*) FROM autores A2, libros L2 WHERE A2.id = L2.autor_id GROUP BY A2.nombre, A2.apellido1, A2.nacionalidad) AND A1.nacionalidad = A2.nacionalidad;',
+                "SELECT * FROM libros WHERE autor_id IN (SELECT id FROM autores WHERE nombre = 'María' AND apellido1 = 'Dueñas' AND apellido2 = 'Vinuesa');",
+                "... WHERE id NOT IN (SELECT socio_id FROM prestamos WHERE libro_id IN (SELECT id FROM libros WHERE titulo LIKE 'Harry Potter%'));",
+                "... GROUP BY a.nombre, a.apellido1 HAVINGa.id = l.autor_id AND l.id = p.libro_id ANDa.nacionalidad = 'Gran Bretaña' ;",
+                "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;",
+                '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;',
                 'DELETE FROM socios WHERE id=14;',
+                1.0,
+                -0.25,
+                1.0,
+                -0.25,
+                1.0,
+                1.0,
+                -0.25,
+                -0.25,
+                1.0,
                 1.0
             ]
         ], columns=columnas)
