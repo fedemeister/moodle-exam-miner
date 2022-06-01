@@ -457,7 +457,8 @@ def test_get_multichoice_dataframe(df_raw):
 def test_answers_in_answers_df_are_in_the_xml(fixture_raw_xml_dataframe,
                                               fixture_json_answers_formatted_df,
                                               fixture_xml_dataframe_with_answers_from_answers_df):
-    actual, nothing1, nothing2 = run_script05(fixture_json_answers_formatted_df, fixture_raw_xml_dataframe)
+    actual, nothing1, nothing2 = run_script05(fixture_json_answers_formatted_df, fixture_raw_xml_dataframe,
+                                              num_preguntas=10)
     expected = fixture_xml_dataframe_with_answers_from_answers_df
     pd.testing.assert_frame_equal(actual, expected)
 
@@ -466,8 +467,9 @@ def test_answers_in_answers_df_are_in_the_xml(fixture_raw_xml_dataframe,
 def test_data_in_answers_df_are_also_in_the_xml_using_dfcheck_variable_and_outputs_from_previous_scripts(
         fixture_json_marks_anonymized, fixture_json_answers_anonymized):
     df_xml_output = run_script02()
-    marks_df, answers_df = create_marks_and_answers_df(fixture_json_marks_anonymized, fixture_json_answers_anonymized)
-    df_todas_preguntas, df_check, nothing = run_script05(answers_df, df_xml_output)
+    marks_df, answers_df = create_marks_and_answers_df(fixture_json_marks_anonymized, fixture_json_answers_anonymized,
+                                                       num_preguntas=10)
+    df_todas_preguntas, df_check, nothing = run_script05(answers_df, df_xml_output, num_preguntas=10)
 
     actual = df_check[df_check == 0].shape[0]
     expected = 0
