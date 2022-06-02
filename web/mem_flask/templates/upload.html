@@ -1,0 +1,131 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+    <div class="container">
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <span class="fs-4">Moodle Exam Miner</span>
+            </a>
+
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="{{ url_for('homepage') }}" class="nav-link" aria-current="page">Inicio</a>
+                </li>
+                <li class="nav-item"><a href="{{ url_for('features') }}" class="nav-link">Características</a></li>
+                <!--<li class="nav-item"><a href="#" class="nav-link disabled">Pricing</a></li> -->
+                <li class="nav-item"><a href="{{ url_for('faqs') }}" class="nav-link">Preguntas Frecuentes</a></li>
+                <li class="nav-item"><a href="{{ url_for('upload') }}" class="nav-link active">Subir archivos</a></li>
+            </ul>
+        </header>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>Bienvenido, analiza visualmente tus cuestionarios de Moodle aquí</h1>
+                <hr>
+
+                <form action="/scripts" method="POST" enctype="multipart/form-data">
+
+                    <div class="form-group">
+
+
+                        <label>Para que la herramienta funcione correctamente hay que usar 4 archivos con un nombre
+                            específico. Para más información entrar en <a href="{{ url_for('faqs') }}"
+                                                                          aria-current="page">Preguntas
+                                frecuentes</a></label>
+                        <br><br>
+                        <div class="custom-file">
+                            <input oninput="filesize(this);" class="form-control" type="file" name="formFileMultiple"
+                                   id="formFileMultiple" multiple/>
+                            <!--<label class="custom-file-label" for="formFileMultiple">Select jsons...</label>-->
+                            <br>
+                        </div>
+                    </div>
+
+                    Seleccionamos el número mínimo de estudiantes que se necesita para formar un clúster <br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"
+                               value="3">
+                        <label class="form-check-label" for="flexRadioDefault1">
+                            3
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"
+                               value="4" checked>
+                        <label class="form-check-label" for="flexRadioDefault2">
+                            4
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3"
+                               value="5">
+                        <label class="form-check-label" for="flexRadioDefault3">
+                            5
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault4"
+                               value="6">
+                        <label class="form-check-label" for="flexRadioDefault4">
+                            6
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault5"
+                               value="7">
+                        <label class="form-check-label" for="flexRadioDefault5">
+                            7
+                        </label>
+                    </div>
+                    <br><br>
+
+
+                    Seleccionamos la diferencia de minutos para que dos estudiantes puedan pertenecer al mismo clúster
+                    <br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioFormMinutos" id="flexRadioDefault6"
+                               value="0">
+                        <label class="form-check-label" for="flexRadioDefault6">
+                            0 minutos
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioFormMinutos" id="flexRadioDefault7"
+                               value="1" checked>
+                        <label class="form-check-label" for="flexRadioDefault7">
+                            ± 1 minuto
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioFormMinutos" id="flexRadioDefault8"
+                               value="2">
+                        <label class="form-check-label" for="flexRadioDefault8">
+                            ± 2 minutos
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioFormMinutos" id="flexRadioDefault9"
+                               value="3">
+                        <label class="form-check-label" for="flexRadioDefault9">
+                            ± 3 minutos
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioFormMinutos" id="flexRadioDefault10"
+                               value="4">
+                        <label class="form-check-label" for="flexRadioDefault10">
+                            ± 4 minutos
+                        </label>
+                    </div>
+                    <br><br>
+                    <button type="submit" class="btn btn-primary">Subir archivos</button>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+

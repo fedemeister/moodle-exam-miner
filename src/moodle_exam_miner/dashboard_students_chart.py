@@ -39,7 +39,7 @@ def fig_estudiantes(merge_df, num_preguntas):
                                           'Productividad al final del examen'],
                               render_mode='svg',
                               # line_shape="spline",
-                              title="Representación gráfica de cómo ha ido la nota del alumno durante el examen. Para enfocarse en un solo alumno, dar doble click al alumno en la leyenda de la derecha.")
+                              title="Representación gráfica del desempeño del estudiante durante el examen. Doble click en el menú para enfocarse.")
 
     fig_estudiantes.update_layout(
         xaxis=dict(

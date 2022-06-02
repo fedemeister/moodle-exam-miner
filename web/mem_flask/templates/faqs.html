@@ -1,20 +1,21 @@
 {% extends 'layout.html' %}
 {% block content %}
-      <div class="container">
-    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-        <span class="fs-4">Moodle Exam Miner</span>
-      </a>
+    <div class="container">
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <span class="fs-4">Moodle Exam Miner</span>
+            </a>
 
-      <ul class="nav nav-pills">
-        <li class="nav-item"><a href="{{url_for('homepage')}}" class="nav-link" aria-current="page">Inicio</a></li>
-        <li class="nav-item"><a href="{{url_for('features')}}" class="nav-link">Características</a></li>
-        <!--<li class="nav-item"><a href="#" class="nav-link disabled">Pricing</a></li> -->
-        <li class="nav-item"><a href="{{url_for('faqs')}}" class="nav-link active">Preguntas Frecuentes</a></li>
-        <li class="nav-item"><a href="{{url_for('about')}}" class="nav-link">Acerca de MEM</a></li>
-      </ul>
-    </header>
-  </div>
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="{{ url_for('homepage') }}" class="nav-link" aria-current="page">Inicio</a>
+                </li>
+                <li class="nav-item"><a href="{{ url_for('features') }}" class="nav-link">Características</a></li>
+                <li class="nav-item"><a href="{{ url_for('faqs') }}" class="nav-link active">Preguntas Frecuentes</a>
+                </li>
+                <li class="nav-item"><a href="{{ url_for('upload') }}" class="nav-link">Subir archivos</a></li>
+            </ul>
+        </header>
+    </div>
     <div class="container">
         <div class="row">
             <div class="col">
@@ -26,21 +27,22 @@
                     <li>Archivo JSON con los logs del día del examen: <i>exam_logs.json </i></li>
                     <li>Archivo JSON con las respuestas de los estudiantes para cada pregunta: <i> exam_answers.json</i>
                     </li>
-                    <li>Archivo JSON con la puntuación de los estudiantes para cada pregunta: <i>exam_califications.json</i>
+                    <li>Archivo JSON con la puntuación de los estudiantes para cada pregunta:
+                        <i>exam_califications.json</i>
                     </li>
                     <li>Archivo XML con el conjunto global de preguntas que el profesor ha usado para crear el examen en
                         Moodle. <i>exam_questions_set.xml</i>
                     </li>
                 </ul>
             </div>
-            <img src="{{url_for('static', filename='FAQs_howtostart1.png')}}" alt="web_principal_new">
-            <img src="{{url_for('static', filename='FAQs_howtostart2.png')}}" alt="web_principal_new2">
-            <img src="{{url_for('static', filename='FAQs_howtostart3.png')}}" alt="web_principal_new3">
-            <img src="{{url_for('static', filename='FAQs_howtostart4.png')}}" alt="web_principal_new4">
+            <img src="{{ url_for('static', filename='FAQs_howtostart1.png') }}" alt="web_principal_new">
+            <img src="{{ url_for('static', filename='FAQs_howtostart2.png') }}" alt="web_principal_new2">
+            <img src="{{ url_for('static', filename='FAQs_howtostart3.png') }}" alt="web_principal_new3">
+            <img src="{{ url_for('static', filename='FAQs_howtostart4.png') }}" alt="web_principal_new4">
             <h3> Después de unos segundos, obtendremos el resultado del informe </h3>
-            <img src="{{url_for('static', filename='FAQs_howtostart5.png')}}" alt="web_principal_new5">
-             <h2>Cómo renombrar tus archivos correctamente</h2>
-             <h2>Cómo crear tu examen para que la herramienta funcione</h2>
+            <img src="{{ url_for('static', filename='FAQs_howtostart5.png') }}" alt="web_principal_new5">
+            <h2>Cómo renombrar tus archivos correctamente</h2>
+            <h2>Cómo crear tu examen para que la herramienta funcione</h2>
         </div>
     </div>
 

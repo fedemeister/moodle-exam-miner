@@ -16,7 +16,7 @@ def fig_estudiantes():
                             },
                 render_mode ='svg',
                 #line_shape="spline",
-            title="Representación gráfica de cómo ha ido la nota del alumno durante el examen. Para enfocarse en un solo alumno, dar doble click al alumno en la leyenda de la derecha.")
+            title="Representación gráfica de cómo ha ido la nota del alumno durante el examen. Doble click en el menú para enfocarse.")
 
     fig_estudiantes.update_layout(
             xaxis=dict(

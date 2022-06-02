@@ -123,7 +123,8 @@ def scripts_run():
                                render_mode='svg',
                                line_shape="spline",
                                symbol="Cluster",
-                               title="Representación gráfica de cómo ha ido la nota del estudiante durante el examen. Para enfocarse en un solo estudiante, dar doble click al estudiante en la leyenda de la derecha.")
+                               title="Posibles clusters de estudiante durante el examen. Doble click en el menú para "
+                                     "enfocarse.")
         # fig_clusters.update_layout(hovermode="x unified")
         fig_clusters.update_layout(
             xaxis=dict(
@@ -163,8 +164,8 @@ def scripts_run():
                                 hover_data={"Código": True,
                                             "Número": True},
                                 render_mode='svg',
-                                title="Notas obtenidas en la pregunta durante la duración del examen. Para enfocarse en "
-                                      "una sola pregunta, dar doble click a la pregunta deseada.")
+                                title="Notas obtenidas en la pregunta durante la duración del examen. Doble click en "
+                                      "el menú para enfocarse.")
         fig_questions.update_yaxes(range=[-0.35, 1.10])
         fig_questions.update_layout(hovermode="x unified")
 
@@ -231,7 +232,7 @@ def scripts_run():
         html.Div([
             html.H1(children='Comportamiento de cada pregunta'),
             html.Div(children='''En este gráfico con mayor detalle cada una de las preguntas del examen. Se pueden 
-        comparar más de una pregunta seleccionando aquí abajo las preguntas deseadas de la 1 a la 10.''',
+        comparar más de una pregunta seleccionando aquí abajo las preguntas deseadas.''',
                      style={'padding': 10}),
             dcc.Checklist(
                 id="checklist_questions",
@@ -255,9 +256,9 @@ def homepage():
     return render_template('base.html', title='Inicio')
 
 
-@app.route('/about')
-def about():
-    return render_template('about.html', title='Acerca de MEM')
+@app.route('/upload')
+def upload():
+    return render_template('upload.html', title='Subir archivos')
 
 
 @app.route('/features')

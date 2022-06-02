@@ -1,47 +1,47 @@
 {% extends 'layout.html' %}
 {% block content %}
-      <div class="container">
-    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-        <span class="fs-4">Moodle Exam Miner</span>
-      </a>
+    <div class="container">
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <span class="fs-4">Moodle Exam Miner</span>
+            </a>
 
-      <ul class="nav nav-pills">
-        <li class="nav-item"><a href="{{url_for('homepage')}}" class="nav-link active" aria-current="page">Inicio</a></li>
-        <li class="nav-item"><a href="{{url_for('features')}}" class="nav-link">Características</a></li>
-        <!--<li class="nav-item"><a href="#" class="nav-link disabled">Pricing</a></li> -->
-        <li class="nav-item"><a href="{{url_for('faqs')}}" class="nav-link">Preguntas Frecuentes</a></li>
-        <li class="nav-item"><a href="{{url_for('about')}}" class="nav-link">Acerca de MEM</a></li>
-      </ul>
-    </header>
-  </div>
-<div class="container">
-  <div class="row">
-    <div class="col">
-
-      <h1>Bienvenido, suba los ficheros del examen</h1>
-      <hr>
-
-      <form action="/scripts" method="POST" enctype="multipart/form-data">
-
-        <div class="form-group">
-
-
-          <label>Para que la herramienta funcione correctamente hay que usar 4 archivos con un nombre específico. Para más información entrar en <a href="{{url_for('faqs')}}" aria-current="page">Preguntas frecuentes</a></label>
-            <br><br>
-          <div class="custom-file">
-            <input oninput="filesize(this);" class="form-control" type="file" name="formFileMultiple" id="formFileMultiple" multiple />
-            <!--<label class="custom-file-label" for="formFileMultiple">Select jsons...</label>-->
-              <br>
-          </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Subir archivos</button>
-
-      </form>
-
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="{{ url_for('homepage') }}" class="nav-link active" aria-current="page">Inicio</a>
+                </li>
+                <li class="nav-item"><a href="{{ url_for('features') }}" class="nav-link">Características</a></li>
+                <li class="nav-item"><a href="{{ url_for('faqs') }}" class="nav-link">Preguntas Frecuentes</a></li>
+                <li class="nav-item"><a href="{{ url_for('upload') }}" class="nav-link">Subir archivos</a></li>
+            </ul>
+        </header>
     </div>
-  </div>
-</div>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="a-example-divider"></div>
+                <div class="px-4 pt-5 my-5 text-center">
+                    <h1 class="display-4 fw-bold">Bienvenido, analiza visualmente tus cuestionarios de Moodle aquí</h1>
+                    <div class="col-lg-6 mx-auto">
+                        <p class="lead mb-4">Podrás obtener información gracias a nuestro informe con gráficos
+                            interactivos y sabrás todo lo que ha pasado en el cuestionario de Moodle de una manera
+                            sencilla y rápida.</p>
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
+
+                            <a class="btn btn-primary btn-lg px-4 me-sm-3" role="button"
+                               href="{{ url_for('upload') }}">Empezar</a>
+                            <a class="btn btn-outline-secondary btn-lg px-4" role="button"
+                               href="{{ url_for('features') }}">Aprender más</a>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden" style="max-height: 30vh;">
+                        <div class="container px-5">
+                            <img src="../static/gif_todos.gif" class="img-fluid border rounded-3"
+                                 alt="Example image" width="700" height="500" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock content %}
