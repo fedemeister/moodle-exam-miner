@@ -121,7 +121,9 @@ def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_
 def run_pycollaborator(answers_df, marks_df, num_preguntas) -> Tuple[Dict[str, List[Dict]], pd.DataFrame]:
     py_cheat_df = marks_df[["Nombre", "Código", "Tiempo", "Inicio", "Fin", "Segundos", "Nota"]]
     py_cheat_df["Productividad"] = (py_cheat_df["Nota"] / (py_cheat_df["Segundos"] / 60))
-    columnas = ['Q' + str(i + 1) for i in range(num_preguntas)]
+    columna_basica = ["Código"]
+    columnas_preguntas = ['Q' + str(i + 1) for i in range(num_preguntas)]
+    columnas = columna_basica + columnas_preguntas
 
     py_collaborator = []
     [py_collaborator.append(function(i, columnas, py_cheat_df, answers_df, marks_df, num_preguntas)) for i in

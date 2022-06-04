@@ -4061,7 +4061,22 @@ def fixture_py_collaborator_anonymized():
                 'time_seconds': 1340,
                 'grade': 5.0,
                 'productividad': 0.22388059701492538,
-                'answers': []
+                'answers': [
+                    {
+                        'question_id': 8,
+                        'text': "SELECT COUNT(*) 'Prestados' FROM prestamos P, socios S WHERE socio_id = S.id AND S.nombre = 'Ernesto' GROUP BY S.id;",
+                        'score': -0.25,
+                        'counter': 1,
+                        'suspects': ['user2']
+                    },
+                    {
+                        'question_id': 9,
+                        'text': '... FROM socios s LEFT OUTER JOIN prestamos p ON s.id = p.socio_id;',
+                        'score': 1.0,
+                        'counter': 1,
+                        'suspects': ['user2']
+                    }
+                ]
             }
         ]}
 
