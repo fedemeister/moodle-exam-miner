@@ -4033,7 +4033,7 @@ def fixture_py_collaborator_anonymized():
                 'end': Timestamp('2020-05-22 11:22:00'),
                 'time_seconds': 1351,
                 'grade': 8.75,
-                'productividad': 0.38860103626943004,
+                'productividad': 0.6476683937823834,
                 'answers': []
             },
             {
@@ -4042,7 +4042,7 @@ def fixture_py_collaborator_anonymized():
                 'end': Timestamp('2020-05-22 11:23:00'),
                 'time_seconds': 1426,
                 'grade': 8.75,
-                'productividad': 0.36816269284712483,
+                'productividad': 0.6136044880785414,
                 'answers': []
             },
             {
@@ -4051,7 +4051,7 @@ def fixture_py_collaborator_anonymized():
                 'end': Timestamp('2020-05-22 12:14:00'),
                 'time_seconds': 853,
                 'grade': 2.5,
-                'productividad': 0.17584994138335286,
+                'productividad': 0.29308323563892147,
                 'answers': []
             },
             {
@@ -4060,7 +4060,7 @@ def fixture_py_collaborator_anonymized():
                 'end': Timestamp('2020-05-22 13:19:00'),
                 'time_seconds': 1340,
                 'grade': 5.0,
-                'productividad': 0.22388059701492538,
+                'productividad': 0.3731343283582089,
                 'answers': [
                     {
                         'question_id': 8,
@@ -4093,7 +4093,7 @@ def fixture_py_cheat_df_anonymized():
             Timestamp('2020-05-22 11:22:00'),
             1351,
             8.75,
-            0.38860103626943004
+            0.6476683937823834
         ],
         [
             'user0',
@@ -4103,7 +4103,7 @@ def fixture_py_cheat_df_anonymized():
             Timestamp('2020-05-22 11:23:00'),
             1426,
             8.75,
-            0.36816269284712483
+            0.6136044880785414
         ],
         [
             'user2',
@@ -4113,7 +4113,7 @@ def fixture_py_cheat_df_anonymized():
             Timestamp('2020-05-22 12:14:00'),
             853,
             2.5,
-            0.17584994138335286
+            0.29308323563892147
         ],
         [
             'user3',
@@ -4123,7 +4123,7 @@ def fixture_py_cheat_df_anonymized():
             Timestamp('2020-05-22 13:19:00'),
             1340,
             5.0,
-            0.22388059701492538]
+            0.3731343283582089]
     ], columns=columnas)
 
 
@@ -4149,7 +4149,7 @@ def fixture_merge_df_anonymized():
                 datetime(2020, 5, 22, 11, 22), #Fin
                 1351, #Segundos
                 8.75, #Nota
-                0.38860103626943004, #Productividad
+                0.6476683937823834, #Productividad
                 datetime(2020, 5, 22, 11, 1),  # Q1_t
                 datetime(2020, 5, 22, 11, 2),  # Q2_t
                 datetime(2020, 5, 22, 11, 4),  # Q3_t
@@ -4203,7 +4203,7 @@ def fixture_merge_df_anonymized():
                 datetime(2020, 5, 22, 11, 23),
                 1426,
                 8.75,
-                0.36816269284712483,
+                0.6136044880785414,
                 datetime(2020, 5, 22, 11, 2, 18),
                 datetime(2020, 5, 22, 11, 4, 36),
                 datetime(2020, 5, 22, 11, 6, 54),
@@ -4257,7 +4257,7 @@ def fixture_merge_df_anonymized():
                 datetime(2020, 5, 22, 12, 14),
                 853,
                 2.5,
-                0.17584994138335286,
+                0.29308323563892147,
                 datetime(2020, 5, 22, 12, 2),
                 datetime(2020, 5, 22, 12, 3),
                 datetime(2020, 5, 22, 12, 3),
@@ -4311,7 +4311,7 @@ def fixture_merge_df_anonymized():
                 datetime(2020, 5, 22, 13, 19),
                 1340,
                 5.0,
-                0.22388059701492538,
+                0.3731343283582089,
                 datetime(2020, 5, 22, 12, 58),
                 datetime(2020, 5, 22, 13, 1),
                 datetime(2020, 5, 22, 13, 3),
