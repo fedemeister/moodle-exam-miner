@@ -8,8 +8,7 @@ def funcion_clusters(py_cheat_df, merge_df, config_num_stud_cluster, config_dif_
     lista_j = []
     for i in range(0, len(py_cheat)):
         for j in range(0, len(py_cheat)):
-            if (    (py_cheat.iloc[i]['Productividad'] <= py_cheat.iloc[j]['Productividad']) &
-                    (py_cheat.iloc[i]['Nota'] <= py_cheat.iloc[j]['Nota']) &
+            if ((py_cheat.iloc[i]['Productividad'] <= py_cheat.iloc[j]['Productividad']) &
                     (
                             (py_cheat.iloc[i]['Fin'] >= (
                                     py_cheat.iloc[j]['Inicio'] - timedelta(minutes=config_dif_minutos_cl)))
