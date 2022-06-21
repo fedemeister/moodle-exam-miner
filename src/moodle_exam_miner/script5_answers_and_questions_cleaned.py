@@ -74,8 +74,8 @@ def limpiar_respuestas_df(df: pd.DataFrame, Q: int):
     df['Q' + str(Q)] = df['Q' + str(Q)].replace([u'SELECTnacionalidad'], u'SELECT nacionalidad', regex=True)
 
 
-def run_script05(answers_df: pd.DataFrame, df_xml_output: pd.DataFrame, num_preguntas) -> Tuple[
-    pd.DataFrame, pd.Series, pd.DataFrame]:
+def run_script05(answers_df: pd.DataFrame, df_xml_output: pd.DataFrame, num_preguntas) -> \
+        Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
     """
     En esta función vamos a hacer que las respuestas que vienen del conjunto XML y las que vienen a través del
     conjunto answers_df (que previamente viene del json answers) contengan los mismos elementos.

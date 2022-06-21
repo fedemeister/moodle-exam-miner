@@ -25,7 +25,6 @@ def get_answer_times_df(marks_df, log_json, num_preguntas) -> pd.DataFrame:
         name = marks_df.iloc[i].Nombre
         start = marks_df.iloc[i].Inicio
         end = marks_df.iloc[i].Fin
-        mark = marks_df.iloc[i].Nota
 
         json_particular_df = json_df[(json_df['Hora'] >= start)
                                      & (json_df['Hora'] <= end)
@@ -34,9 +33,6 @@ def get_answer_times_df(marks_df, log_json, num_preguntas) -> pd.DataFrame:
                                      & ((json_df['Resumen'] == "Intento de cuestionario visualizado")
                                         | (json_df['Resumen'] == "Intento enviado"))
                                      ]
-        # guardamos cuántas filas tenía antes de hacer el preprocesado.
-        # Esto sirve para saber cuáles tenían > 10 visualizaciones de respuestas
-        n_rows = (json_particular_df.shape[0] - 1)
 
         json_particular_df.reset_index(drop=True, inplace=True)
 
@@ -54,15 +50,15 @@ def get_answer_times_df(marks_df, log_json, num_preguntas) -> pd.DataFrame:
                 lista_nombre.append(name)
             datos = {'Horas': lista_horas}
             json_particular_df = pd.DataFrame(datos)
+        if json_particular_df.shape[0] >= 10:
+            json_T = json_particular_df.T
+            json_T.columns = columnas_preguntas
+            json_T = json_T.head(1)
+            json_T.insert(0, "Nombre", [name])
+            json_T.insert(1, "Inicio", [start])
+            json_T.reset_index(drop=True, inplace=True)
 
-        json_T = json_particular_df.T
-        json_T.columns = columnas_preguntas
-        json_T = json_T.head(1)
-        json_T.insert(0, "Nombre", [name])
-        json_T.insert(1, "Inicio", [start])
-        json_T.reset_index(drop=True, inplace=True)
-
-        df_answer_times = pd.concat([df_answer_times, json_T])
+            df_answer_times = pd.concat([df_answer_times, json_T])
 
     df_answer_times.reset_index(drop=True, inplace=True)
 

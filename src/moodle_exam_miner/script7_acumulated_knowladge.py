@@ -26,11 +26,12 @@ def merge_dataframes(py_cheat_df: pd.DataFrame, respuestas_df: pd.DataFrame, pre
     columnas_preguntas_a = ['Q' + str(i + 1) + '_a' for i in range(num_preguntas)]
     columnas_preguntas_m = ['Q' + str(i + 1) + '_m' for i in range(num_preguntas)]
 
-    columnas_finales = columnas_q0 + columnas_basicas + columnas_preguntas_t + columnas_preguntas_q + \
-                       columnas_preguntas_a + columnas_preguntas_m
-    merge_df = pd.DataFrame(data=py_cheat_df[['Nombre', 'Código', 'Tiempo',
-                                              'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']]
-                            , columns=columnas_finales)
+    columnas_finales = \
+        columnas_q0 + columnas_basicas + columnas_preguntas_t + \
+        columnas_preguntas_q + columnas_preguntas_a + columnas_preguntas_m
+    merge_df = pd.DataFrame(
+        data=py_cheat_df[['Nombre', 'Código', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']],
+        columns=columnas_finales)
 
     for i in range(0, merge_df.shape[0]):
         merge_df['Q0_t'][i] = respuestas_df['Inicio'][i]
@@ -74,14 +75,15 @@ def misma_pregunta_luego(x, pregunta: str, respuesta: str, hora_respuesta, merge
         Código del estudiante que respondió igual que el estudiante_sub_i la siguiente vez que esa pregunta apareció
         o puede devolver 0, False si no encuentra ese estudiante.
     """
-    if len(merge_df['Código'][
-               (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)]) > 0:
-        cod1 = merge_df['Código'][
-            (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta)].iloc[
-            0]  # el siguiente
-        if len(merge_df['Código'][
-                   (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
-                   (merge_df['Q' + str(x) + '_a'] == respuesta)]) > 0:
+    if len(merge_df['Código']
+           [(merge_df['Q' + str(x) + '_q'] == pregunta) &
+            (merge_df['Q' + str(x) + '_t'] > hora_respuesta)]) > 0:
+        cod1 = merge_df['Código'][(merge_df['Q' + str(x) + '_q'] == pregunta) &
+                                  (merge_df['Q' + str(x) + '_t'] > hora_respuesta)].iloc[0]  # el siguiente
+        if len(merge_df['Código']
+               [(merge_df['Q' + str(x) + '_q'] == pregunta) &
+                (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
+                (merge_df['Q' + str(x) + '_a'] == respuesta)]) > 0:
             cod2 = merge_df['Código'][
                 (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
                 (merge_df['Q' + str(x) + '_a'] == respuesta)].iloc[0]  # el siguiente
