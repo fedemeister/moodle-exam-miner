@@ -3,6 +3,8 @@ from typing import Tuple, Dict, List
 import pandas as pd
 from datetime import datetime
 
+IDENTIFICADOR = 'Código'
+
 
 def estudiantes_que_terminaron_antes(hora: datetime, df_estudiantes: pd.DataFrame) -> bool:
     return df_estudiantes["Fin"] <= hora
@@ -13,16 +15,16 @@ def estudiantes_con_menor_productividad(productividad: float, df_estudiantes: pd
 
 
 def respuestas_del_estudiante(codigo: str, respuestas_df: pd.DataFrame, num_preguntas) -> bool:
-    estudiante = respuestas_df[respuestas_df["Código"] == codigo]
-    columnas_basicas = ['Código']
+    estudiante = respuestas_df[respuestas_df[IDENTIFICADOR] == codigo]
+    columnas_basicas = [IDENTIFICADOR]
     columnas_preguntas = ['Q' + str(i + 1) for i in range(num_preguntas)]
     columnas_finales = columnas_basicas + columnas_preguntas
     return estudiante[columnas_finales]
 
 
 def calificaciones_del_estudiante(codigo: str, calificaciones_df: pd.DataFrame, num_preguntas) -> bool:
-    calificaciones = calificaciones_df[calificaciones_df["Código"] == codigo]
-    columnas_basicas = ['Código']
+    calificaciones = calificaciones_df[calificaciones_df[IDENTIFICADOR] == codigo]
+    columnas_basicas = [IDENTIFICADOR]
     columnas_preguntas = ['Q' + str(i + 1) for i in range(num_preguntas)]
     columnas_finales = columnas_basicas + columnas_preguntas
     return calificaciones[columnas_finales]
@@ -62,13 +64,13 @@ def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_
 
     respuestas_otros_df = pd.DataFrame(columns=columnas)
 
-    cod_estudiante = py_cheat_df["Código"][i]
+    cod_estudiante = py_cheat_df[IDENTIFICADOR][i]
 
     respuestas_estudiante_i_df = respuestas_del_estudiante(cod_estudiante, respuestas_df, num_preguntas)
     calificaciones_estudiante_i_df = calificaciones_del_estudiante(cod_estudiante, calificaciones_df, num_preguntas)
 
     for z in range(len(df)):
-        df2 = respuestas_del_estudiante(df['Código'].iloc[z], respuestas_df, num_preguntas)
+        df2 = respuestas_del_estudiante(df[IDENTIFICADOR].iloc[z], respuestas_df, num_preguntas)
         respuestas_otros_df = pd.concat([respuestas_otros_df, df2], ignore_index=True)
 
     contador_de_respuestas = []
@@ -88,7 +90,7 @@ def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_
                     answer["text"] = respuestas_estudiante_i_df.iloc[0][respuesta]
                     answer["score"] = calificaciones_estudiante_i_df.iloc[0][respuesta]
                     answer["counter"] = 1
-                    sospechosos_respuesta.append(respuestas_otros_df.loc[estudiante]["Código"])
+                    sospechosos_respuesta.append(respuestas_otros_df.loc[estudiante][IDENTIFICADOR])
                 else:  # hay que tener en cuenta el caso de la respuesta "-" porque se puede dar más de una vez
                     # por lo que no vale solo con mirar en contador_de_respuestas
                     if respuestas_estudiante_i_df.iloc[0][respuesta] == "-":
@@ -102,7 +104,7 @@ def function(i: int, columnas: List[str], py_cheat_df: pd.DataFrame, respuestas_
                             answer["counter"] = answer["counter"] + 1
                     else:
                         answer["counter"] = answer["counter"] + 1
-                        sospechosos_respuesta.append(respuestas_otros_df.loc[estudiante]["Código"])
+                        sospechosos_respuesta.append(respuestas_otros_df.loc[estudiante][IDENTIFICADOR])
         if sospechosos_respuesta:  # si sospechosos_respuesta contiene algo
             answer["suspects"] = sospechosos_respuesta
             lista_de_respuestas_a_tener_en_cuenta.append(answer)

@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import json
 
+IDENTIFICADOR = 'Código'
+
 
 def merge_dataframes(py_cheat_df: pd.DataFrame, respuestas_df: pd.DataFrame, preguntas_df: pd.DataFrame,
                      hora_respuestas_df: pd.DataFrame, marks_df: pd.DataFrame, num_preguntas: int) -> pd.DataFrame:
@@ -30,7 +32,7 @@ def merge_dataframes(py_cheat_df: pd.DataFrame, respuestas_df: pd.DataFrame, pre
         columnas_q0 + columnas_basicas + columnas_preguntas_t + \
         columnas_preguntas_q + columnas_preguntas_a + columnas_preguntas_m
     merge_df = pd.DataFrame(
-        data=py_cheat_df[['Nombre', 'Código', 'Tiempo', 'Inicio', 'Fin', 'Segundos', 'Nota', 'Productividad']],
+        data=py_cheat_df[columnas_basicas],
         columns=columnas_finales)
 
     for i in range(0, merge_df.shape[0]):
@@ -39,7 +41,6 @@ def merge_dataframes(py_cheat_df: pd.DataFrame, respuestas_df: pd.DataFrame, pre
         merge_df['Q0_q'][i] = '-'
         merge_df['Q0_m'][i] = 0
         for x in range(1, num_preguntas + 1):
-            # merge_df['Código'][i] = respuestas_df['Código'][i]
             aux = respuestas_df['Q' + str(x)][i]
             nota = float(marks_df['Q' + str(x)][i])
             time = hora_respuestas_df['Q' + str(x) + '_t'][i]
@@ -62,7 +63,7 @@ def merge_dataframes(py_cheat_df: pd.DataFrame, respuestas_df: pd.DataFrame, pre
 def misma_pregunta_luego(x, pregunta: str, respuesta: str, hora_respuesta, merge_df: pd.DataFrame) -> (bool, str):
     """
     Devuelve el siguiente alumno que ha respondido correctamente a la misma pregunta que el estudiante_sub_i.
-    Esta función sirve para la función CA (Conocimiento Acumulado) que mide una posible cadena de colaboración
+    Esta función sirve para la función conocimiento_acumulado (Conocimiento Acumulado) que mide una posible cadena de colaboración
     entre los estudiantes encadenando preguntas correctamente respondidas.
     Args:
         x: Número de la pregunta (1 a num_preguntas).
@@ -75,16 +76,16 @@ def misma_pregunta_luego(x, pregunta: str, respuesta: str, hora_respuesta, merge
         Código del estudiante que respondió igual que el estudiante_sub_i la siguiente vez que esa pregunta apareció
         o puede devolver 0, False si no encuentra ese estudiante.
     """
-    if len(merge_df['Código']
+    if len(merge_df[IDENTIFICADOR]
            [(merge_df['Q' + str(x) + '_q'] == pregunta) &
             (merge_df['Q' + str(x) + '_t'] > hora_respuesta)]) > 0:
-        cod1 = merge_df['Código'][(merge_df['Q' + str(x) + '_q'] == pregunta) &
-                                  (merge_df['Q' + str(x) + '_t'] > hora_respuesta)].iloc[0]  # el siguiente
-        if len(merge_df['Código']
+        cod1 = merge_df[IDENTIFICADOR][(merge_df['Q' + str(x) + '_q'] == pregunta) &
+                                       (merge_df['Q' + str(x) + '_t'] > hora_respuesta)].iloc[0]  # el siguiente
+        if len(merge_df[IDENTIFICADOR]
                [(merge_df['Q' + str(x) + '_q'] == pregunta) &
                 (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
                 (merge_df['Q' + str(x) + '_a'] == respuesta)]) > 0:
-            cod2 = merge_df['Código'][
+            cod2 = merge_df[IDENTIFICADOR][
                 (merge_df['Q' + str(x) + '_q'] == pregunta) & (merge_df['Q' + str(x) + '_t'] > hora_respuesta) &
                 (merge_df['Q' + str(x) + '_a'] == respuesta)].iloc[0]  # el siguiente
             return cod1 == cod2, cod1
@@ -94,9 +95,9 @@ def misma_pregunta_luego(x, pregunta: str, respuesta: str, hora_respuesta, merge
         return False, '0'
 
 
-def CA(i: int, merge_df: pd.DataFrame, num_preguntas: int) -> {}:
+def conocimiento_acumulado(i: int, merge_df: pd.DataFrame, num_preguntas: int) -> {}:
     """
-    CA (Conocimiento Acumulado) es una función que mide una posible red sospechosa de intercambio de preguntas
+    conocimiento_acumulado (Conocimiento Acumulado) es una función que mide una posible red sospechosa de intercambio de preguntas
     observando si se producen cadenas de estudiantes que van respondiendo la misma pregunta de forma seguida
     de manera correcta.
     Args:
@@ -109,16 +110,16 @@ def CA(i: int, merge_df: pd.DataFrame, num_preguntas: int) -> {}:
 
     """
     student = {}
-    codigo = merge_df['Código'][i]
+    codigo = merge_df[IDENTIFICADOR][i]
     inicio = merge_df['Inicio'][i]
     fin = merge_df['Fin'][i]
     segundos = merge_df['Segundos'][i]
     nota = merge_df['Nota'][i]
 
-    lista_CA_r = []  # respuestas
-    lista_CA_i = []  # 1 si es pregunta 1, 2 si es pregunta 2 y así sucesivamente
-    lista_CA_p = []  # pregunta
-    lista_CA_c = []  # código del alumno o userXYZ
+    lista_ca_r = []  # respuestas
+    lista_ca_i = []  # 1 si es pregunta 1, 2 si es pregunta 2 y así sucesivamente
+    lista_ca_p = []  # pregunta
+    lista_ca_c = []  # código del alumno o userXYZ
     for x in range(1, num_preguntas + 1):
         pregunta = merge_df['Q' + str(x) + '_q'][i]
         puntuacion = merge_df['Q' + str(x) + '_m'][i]
@@ -128,10 +129,10 @@ def CA(i: int, merge_df: pd.DataFrame, num_preguntas: int) -> {}:
         if puntuacion == 1.0:
             flag, cod = misma_pregunta_luego(x, pregunta, respuesta, hora, merge_df)
             if flag:
-                lista_CA_r.append(respuesta)
-                lista_CA_i.append(x)
-                lista_CA_p.append(pregunta)
-                lista_CA_c.append(cod)
+                lista_ca_r.append(respuesta)
+                lista_ca_i.append(x)
+                lista_ca_p.append(pregunta)
+                lista_ca_c.append(cod)
 
     student["student_id"] = codigo
     student["start"] = inicio
@@ -139,10 +140,10 @@ def CA(i: int, merge_df: pd.DataFrame, num_preguntas: int) -> {}:
     student["time_seconds"] = segundos
     student["grade"] = nota
     student["productividad"] = merge_df["Productividad"][i]
-    student["respuestas"] = lista_CA_r
-    student['qx'] = lista_CA_i
-    student['preguntas'] = lista_CA_p
-    student['cod'] = lista_CA_c
+    student["respuestas"] = lista_ca_r
+    student['qx'] = lista_ca_i
+    student['preguntas'] = lista_ca_p
+    student['cod'] = lista_ca_c
 
     return student
 
@@ -212,16 +213,16 @@ def run_script07(answers_df_cleaned, df_xml_cleaned, answer_times_merged_df, py_
 
     salida = []
     for i in range(len(merge_df)):
-        salida.append(CA(i, merge_df, num_preguntas))
+        salida.append(conocimiento_acumulado(i, merge_df, num_preguntas))
 
-    conocimiento_acumulado = {"students": salida}
+    conocimiento_acumulado_salida = {"students": salida}
 
     result = merge_df.to_json(index='Nombre', orient="index", date_format='iso', date_unit='s')
     merge_df_json = json.loads(result)
 
     merge_df = merge_df_columns_to_datetime64(merge_df, num_preguntas)
 
-    return merge_df, ratio_preguntas, conocimiento_acumulado, merge_df_json
+    return merge_df, ratio_preguntas, conocimiento_acumulado_salida, merge_df_json
 
 
 def merge_df_columns_to_datetime64(merge_df: pd.DataFrame, num_preguntas: int) -> pd.DataFrame:

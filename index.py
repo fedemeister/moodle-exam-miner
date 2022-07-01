@@ -17,7 +17,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 @app.route('/zipped_data')
 def zipped_data():
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    fileName = "tool_output_{}.zip".format(timestr)
+    file_name = "tool_output_{}.zip".format(timestr)
     memory_file = BytesIO()
     file_path = 'files/tool_output'
     with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
@@ -26,7 +26,7 @@ def zipped_data():
                 zipf.write(os.path.join(root, file))
     memory_file.seek(0)
     return send_file(memory_file,
-                     attachment_filename=fileName,
+                     attachment_filename=file_name,
                      as_attachment=True)
 
 
@@ -111,21 +111,17 @@ def scripts_run():
                                y="Nota",
                                markers=True,
                                color="Código",
-                               # color="Cluster",
                                hover_name='variable',
                                hover_data={"Cluster": True,
                                            "Pregunta": True,
                                            'Respuesta': True,
                                            'Tiempo que tardó en hacer el examen': True,
-                                           'Productividad al final del examen': ':.2f',
-                                           # 'Nombre':True
-                                           },
+                                           'Productividad al final del examen': ':.2f'},
                                render_mode='svg',
                                line_shape="spline",
                                symbol="Cluster",
                                title="Posibles clusters de estudiante durante el examen. Doble click en el menú para "
                                      "enfocarse.")
-        # fig_clusters.update_layout(hovermode="x unified")
         fig_clusters.update_layout(
             xaxis=dict(
                 rangeselector=dict(
@@ -276,7 +272,7 @@ app.config["ALLOWED_FILES_EXTENSIONS"] = ["JSON", "XML"]
 
 
 def allowed_extensions(filename):
-    if not "." in filename:
+    if "." not in filename:
         return False
     ext = filename.rsplit(".", 1)[1]
     if ext.upper() in app.config["ALLOWED_FILES_EXTENSIONS"]:

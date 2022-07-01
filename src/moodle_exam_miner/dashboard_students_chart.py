@@ -38,7 +38,6 @@ def fig_estudiantes(merge_df, num_preguntas):
                               hover_data=["Pregunta", 'Respuesta', 'Segundos que tardó en hacer el examen',
                                           'Productividad al final del examen'],
                               render_mode='svg',
-                              # line_shape="spline",
                               title="Representación gráfica del desempeño del estudiante durante el examen. Doble click en el menú para enfocarse.")
 
     fig_estudiantes.update_layout(

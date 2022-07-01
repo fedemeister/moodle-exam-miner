@@ -51,14 +51,14 @@ def get_answer_times_df(marks_df, log_json, num_preguntas) -> pd.DataFrame:
             datos = {'Horas': lista_horas}
             json_particular_df = pd.DataFrame(datos)
         if json_particular_df.shape[0] >= 10:
-            json_T = json_particular_df.T
-            json_T.columns = columnas_preguntas
-            json_T = json_T.head(1)
-            json_T.insert(0, "Nombre", [name])
-            json_T.insert(1, "Inicio", [start])
-            json_T.reset_index(drop=True, inplace=True)
+            json_df_transpuesta = json_particular_df.T
+            json_df_transpuesta.columns = columnas_preguntas
+            json_df_transpuesta = json_df_transpuesta.head(1)
+            json_df_transpuesta.insert(0, "Nombre", [name])
+            json_df_transpuesta.insert(1, "Inicio", [start])
+            json_df_transpuesta.reset_index(drop=True, inplace=True)
 
-            df_answer_times = pd.concat([df_answer_times, json_T])
+            df_answer_times = pd.concat([df_answer_times, json_df_transpuesta])
 
     df_answer_times.reset_index(drop=True, inplace=True)
 

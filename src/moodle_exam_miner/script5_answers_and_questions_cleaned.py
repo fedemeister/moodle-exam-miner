@@ -62,16 +62,16 @@ def clean_df_xml(df_xml_output: pd.DataFrame) -> pd.DataFrame:
     return df_xml_output
 
 
-def limpiar_respuestas_df(df: pd.DataFrame, Q: int):
-    df['Q' + str(Q)] = df['Q' + str(Q)].str.strip()
-    df['Q' + str(Q)] = df['Q' + str(Q)].replace(['\\n'], ' ', regex=True)
-    df['Q' + str(Q)] = df['Q' + str(Q)].replace(['\\t\t'], ' ', regex=True)
-    df['Q' + str(Q)] = df['Q' + str(Q)].replace(['\n'], ' ', regex=True)
-    df['Q' + str(Q)] = df['Q' + str(Q)].replace(['  '], ' ', regex=True)
-    df['Q' + str(Q)] = df['Q' + str(Q)].str.strip()
-    df['Q' + str(Q)] = df['Q' + str(Q)].replace([u'\xa0'], '', regex=True)
-    df['Q' + str(Q)] = df['Q' + str(Q)].str.strip()
-    df['Q' + str(Q)] = df['Q' + str(Q)].replace([u'SELECTnacionalidad'], u'SELECT nacionalidad', regex=True)
+def limpiar_respuestas_df(df: pd.DataFrame, question: int):
+    df['Q' + str(question)] = df['Q' + str(question)].str.strip()
+    df['Q' + str(question)] = df['Q' + str(question)].replace(['\\n'], ' ', regex=True)
+    df['Q' + str(question)] = df['Q' + str(question)].replace(['\\t\t'], ' ', regex=True)
+    df['Q' + str(question)] = df['Q' + str(question)].replace(['\n'], ' ', regex=True)
+    df['Q' + str(question)] = df['Q' + str(question)].replace(['  '], ' ', regex=True)
+    df['Q' + str(question)] = df['Q' + str(question)].str.strip()
+    df['Q' + str(question)] = df['Q' + str(question)].replace([u'\xa0'], '', regex=True)
+    df['Q' + str(question)] = df['Q' + str(question)].str.strip()
+    df['Q' + str(question)] = df['Q' + str(question)].replace([u'SELECTnacionalidad'], u'SELECT nacionalidad', regex=True)
 
 
 def run_script05(answers_df: pd.DataFrame, df_xml_output: pd.DataFrame, num_preguntas) -> \
@@ -108,10 +108,10 @@ def run_script05(answers_df: pd.DataFrame, df_xml_output: pd.DataFrame, num_preg
     # creamos una lista con las respuestas que respondieron los estudiantes durante el examen.
     flat_list = [item for sublist in respuestas for item in sublist]
     flat_list = list(dict.fromkeys(flat_list))  # eliminamos duplicados
-    answer_Series = pd.DataFrame(flat_list, columns=['Answer'])  # lo pasamos a Series
+    answer_series = pd.DataFrame(flat_list, columns=['Answer'])  # lo pasamos a Series
 
     # cuando una respuesta no está en el conjunto global de respuestas nos quedamos con ella
     # df_check guarda las respuestas que están o no están en el fichero xml ya limpio: 1 sí está, 0 no está
-    df_check = answer_Series.Answer.isin(df_xml_output.Answer).astype(int)
+    df_check = answer_series.Answer.isin(df_xml_output.Answer).astype(int)
 
     return df_xml_cleaned, df_check, answers_df_cleaned

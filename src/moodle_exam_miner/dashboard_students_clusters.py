@@ -34,7 +34,7 @@ def funcion_clusters(py_cheat_df, merge_df, config_num_stud_cluster, config_dif_
                 if usuario == lista_de_cluster[cluster][-1] and longitud_minitabla > 1:  # preparamos los cluster
                     # para albergar los nuevos
                     flag_encontrado = True
-                    for f in range(0, longitud_minitabla - 1):
+                    for _ in range(0, longitud_minitabla - 1):
                         cluster_a_copiar = lista_de_cluster[cluster].copy()
                         lista_de_cluster.append(cluster_a_copiar)
                 else:

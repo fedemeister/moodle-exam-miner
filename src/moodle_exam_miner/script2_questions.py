@@ -2,12 +2,6 @@ import pandas_read_xml as pdx
 import pandas as pd
 from typing import Tuple
 
-# df = pdx.read_xml('files/tool_input/exam_questions_set.xml',
-#                   ['quiz', 'question'],
-#                   root_is_rows=False,
-#                   transpose=False,
-#                   encoding='UTF8')
-
 
 def get_just_multichoice_dataframe(df_raw_xml: pd.DataFrame) -> pd.DataFrame:
     """
